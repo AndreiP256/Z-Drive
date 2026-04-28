@@ -7,6 +7,7 @@ import com.z_team.z_drive.entity.User;
 import com.z_team.z_drive.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -44,7 +45,9 @@ public class UserController {
         return ResponseEntity.ok(mapToResponse(user));
     }
 
+    
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<UserResponse> createUser(@RequestBody CreateUserRequest request) {
         User userToCreate = mapCreateRequestToUser(request);
         User createdUser = userService.createUser(userToCreate);
