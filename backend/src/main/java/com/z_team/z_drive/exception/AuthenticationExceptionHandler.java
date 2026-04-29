@@ -21,6 +21,7 @@ import java.util.Map;
 @Component
 @RestControllerAdvice
 public class AuthenticationExceptionHandler implements AuthenticationEntryPoint, AccessDeniedHandler {
+    
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 

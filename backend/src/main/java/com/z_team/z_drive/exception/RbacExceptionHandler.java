@@ -13,6 +13,13 @@ import java.util.Map;
 @RestControllerAdvice
 public class RbacExceptionHandler {
 
+    @ExceptionHandler(org.springframework.http.converter.HttpMessageNotReadableException.class)
+    public ResponseEntity<Map<String, Object>> handleJsonErrors(org.springframework.http.converter.HttpMessageNotReadableException ex) {
+        String errorMessage = "Format JSON invalid sau valoare incorectă: " + 
+                            (ex.getCause() != null ? ex.getCause().getMessage() : ex.getMessage());
+        return error(HttpStatus.BAD_REQUEST, errorMessage);
+    }
+
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<Map<String, Object>> handleNotFound(EntityNotFoundException ex) {
         return error(HttpStatus.NOT_FOUND, ex.getMessage());
