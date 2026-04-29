@@ -16,11 +16,14 @@ import com.z_team.z_drive.dto.files.FolderCreateRequest;
 import com.z_team.z_drive.dto.files.MoveRequest;
 import com.z_team.z_drive.dto.files.RenameRequest;
 import com.z_team.z_drive.entity.FileEntity;
+import com.z_team.z_drive.security.SecurityUtils;
+import com.z_team.z_drive.security.annotations.HasDeletePermission;
+import com.z_team.z_drive.security.annotations.HasReadPermission;
+import com.z_team.z_drive.security.annotations.HasWritePermission;
 import com.z_team.z_drive.service.FileService;
 
 import jakarta.validation.Valid;
 
-import java.io.File;
 import java.io.InputStream;
 import java.util.UUID;
 
@@ -36,37 +39,32 @@ public class FileController {
         this.fileService = fileService;
     }
 
-    //TO DO handle security i think
+    @GetMapping("/test")
+    public ResponseEntity<String> test() {
+        return ResponseEntity.ok("File controller is working!");
+    }
+
     @PostMapping("/upload")
     public ResponseEntity<FileResponse> uploadFile(@Valid @ModelAttribute FileUploadRequest request) {
+        UUID userId = SecurityUtils.getCurrentUserId();
         FileEntity uploadedFile = fileService.uploadFile(
                 request.getFile(), 
                 request.getParentDirId(), 
-                request.getUserId()
+                userId
         );
         return ResponseEntity.ok(mapToResponse(uploadedFile));
     }
 
     @PostMapping("/create-folder")
     public ResponseEntity<FileResponse> createFolder(@Valid @RequestBody FolderCreateRequest request) {
-        FileEntity createdFolder = fileService.createFolder(request.getParentDirId(), request.getUserId(), request.getFolderName());
+        UUID currentUserId = SecurityUtils.getCurrentUserId();
+        FileEntity createdFolder = fileService.createFolder(request.getParentDirId(), currentUserId, request.getFolderName());
         return ResponseEntity.ok(mapToResponse(createdFolder));
     }
 
-    // Getting list of filenames that have been uploaded
-    @GetMapping
-    public String[] getFiles()
-    {
-        String folderPath = System.getProperty("user.dir") +"/Uploads";
-        File directory= new File(folderPath);
-        
-        String[] filenames = directory.list();
-
-        return filenames;
-        
-    }
 
     @DeleteMapping("/delete/{uuid}") 
+    @HasDeletePermission
     public ResponseEntity<String> deleteFile(@PathVariable UUID uuid) {
         try {
             fileService.deleteFile(uuid);
@@ -77,6 +75,7 @@ public class FileController {
     }
 
     @PatchMapping("/rename/{uuid}")
+    @HasWritePermission
     public ResponseEntity<FileResponse> renameFile(
         @PathVariable UUID uuid, 
         @RequestBody RenameRequest request) {
@@ -85,6 +84,7 @@ public class FileController {
         return ResponseEntity.ok(mapToResponse(updated));
     }
 
+    @HasWritePermission
     @PatchMapping("/move/{uuid}")
     public ResponseEntity<FileResponse> moveFile(
         @PathVariable UUID uuid, 
@@ -94,6 +94,7 @@ public class FileController {
         return ResponseEntity.ok(mapToResponse(updated));
     }
 
+    @HasWritePermission
     @PutMapping("/replace/{uuid}")
     public ResponseEntity<FileResponse> replaceFile(
         @PathVariable UUID uuid, 
@@ -109,15 +110,9 @@ public class FileController {
         return ResponseEntity.ok(true);
     }
 
-    @PatchMapping("/permissions/{uuid}")
-    public ResponseEntity<File> changePermissions() {
-        // change permissions logic
-        return ResponseEntity.ok(new File("dummy"));
 
-    }
-
-    
     @GetMapping("/download/{uuid}")
+    @HasReadPermission
     public ResponseEntity<Resource> downloadFile(@PathVariable UUID uuid) {
         FileEntity fileEntity = fileService.getFile(uuid);
         InputStream inputStream = fileService.downloadFile(uuid);

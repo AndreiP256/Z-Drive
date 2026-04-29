@@ -16,7 +16,4 @@ public class FolderCreateRequest {
     private String folderName;
 
     private UUID parentDirId;
-
-    @NotNull(message = "User ID is required")
-    private UUID userId;
 }
