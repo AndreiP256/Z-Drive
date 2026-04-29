@@ -42,10 +42,6 @@ public class UserServiceImpl implements UserService {
             throw new IllegalArgumentException("A user with this email already exists: " + normalizedEmail);
         }
 
-        // Generate ID if it was not already provided
-        if (user.getId() == null) {
-            user.setId(UUID.randomUUID());
-        }
 
         user.setName(user.getName().trim());
         user.setEmail(normalizedEmail);
