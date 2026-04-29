@@ -7,7 +7,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.z_team.z_drive.dto.files.FileResponse;
 import com.z_team.z_drive.dto.files.FileUploadRequest;
-import com.z_team.z_drive.dto.user.UserResponse;
+import com.z_team.z_drive.dto.files.FolderCreateRequest;
+import com.z_team.z_drive.dto.files.MoveRequest;
+import com.z_team.z_drive.dto.files.RenameRequest;
 import com.z_team.z_drive.entity.FileEntity;
 import com.z_team.z_drive.service.FileService;
 
@@ -30,7 +32,7 @@ public class FileController {
     }
 
     //TO DO handle security i think
-    @PostMapping(value = "/upload")
+    @PostMapping("/upload")
     public ResponseEntity<FileResponse> uploadFile(@Valid @ModelAttribute FileUploadRequest request) {
         FileEntity uploadedFile = fileService.uploadFile(
                 request.getFile(), 
@@ -39,7 +41,13 @@ public class FileController {
         );
         return ResponseEntity.ok(mapToResponse(uploadedFile));
     }
-    
+
+    @PostMapping("/create-folder")
+    public ResponseEntity<FileResponse> createFolder(@Valid @RequestBody FolderCreateRequest request) {
+        FileEntity createdFolder = fileService.createFolder(request.getParentDirId(), request.getUserId(), request.getFolderName());
+        return ResponseEntity.ok(mapToResponse(createdFolder));
+    }
+
     // Getting list of filenames that have been uploaded
     @GetMapping
     public String[] getFiles()
@@ -54,14 +62,40 @@ public class FileController {
     }
 
     @DeleteMapping("/delete/{uuid}") 
-    public ResponseEntity<String> deleteFile(@PathVariable("uuid") String uuid) {
+    public ResponseEntity<String> deleteFile(@PathVariable UUID uuid) {
+        try {
+            fileService.deleteFile(uuid);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(404).body("File with id " + uuid + " not found!");
+        }
         return ResponseEntity.ok("File with id " + uuid + " deleted successfully!");
     }
 
-    // TO DO CHANGE THIS, its not a file type variable
-    @PutMapping("/update/{uuid}")
-    public ResponseEntity<String> updateFile(@PathVariable("uuid") String uuid, @RequestBody File newName) {
-        return ResponseEntity.ok("File with id " + uuid + " updated successfully to " + "!");
+    @PatchMapping("/{uuid}/rename")
+    public ResponseEntity<FileResponse> renameFile(
+        @PathVariable UUID uuid, 
+        @RequestBody RenameRequest request) {
+        
+        FileEntity updated = fileService.rename(uuid, request.getNewName());
+        return ResponseEntity.ok(mapToResponse(updated));
+    }
+
+    @PatchMapping("/{uuid}/move")
+    public ResponseEntity<FileResponse> moveFile(
+        @PathVariable UUID uuid, 
+        @RequestBody MoveRequest request) {
+        
+        FileEntity updated = fileService.move(uuid, request.getNewParentId());
+        return ResponseEntity.ok(mapToResponse(updated));
+    }
+
+    @PutMapping("/{uuid}/replace")
+    public ResponseEntity<FileResponse> replaceFile(
+        @PathVariable UUID uuid, 
+        @RequestParam("file") MultipartFile file) {
+        
+        FileEntity updated = fileService.replace(uuid, file);
+        return ResponseEntity.ok(mapToResponse(updated));
     }
 
     @GetMapping("/search")
@@ -70,7 +104,7 @@ public class FileController {
         return ResponseEntity.ok(true);
     }
 
-    @PatchMapping("/{fileId}/permissions")
+    @PatchMapping("/{uuid}/permissions")
     public ResponseEntity<File> changePermissions() {
         // change permissions logic
         return ResponseEntity.ok(new File("dummy"));
