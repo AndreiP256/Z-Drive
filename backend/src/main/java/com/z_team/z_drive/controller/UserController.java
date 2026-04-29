@@ -4,10 +4,12 @@ import com.z_team.z_drive.dto.user.CreateUserRequest;
 import com.z_team.z_drive.dto.user.UpdateUserRequest;
 import com.z_team.z_drive.dto.user.UserResponse;
 import com.z_team.z_drive.entity.User;
+import com.z_team.z_drive.security.UserPrincipal;
 import com.z_team.z_drive.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,6 +23,14 @@ public class UserController {
 
     public UserController(UserService userService) {
         this.userService = userService;
+    }
+
+
+    @GetMapping("/me")
+    public ResponseEntity<UserResponse> getCurrentUser(@AuthenticationPrincipal UserPrincipal principal) {
+        // principal conține ID-ul și Email-ul extrase din JWT
+        User user = userService.getUserProfile(principal.id());
+        return ResponseEntity.ok(mapToResponse(user));
     }
 
     @GetMapping
