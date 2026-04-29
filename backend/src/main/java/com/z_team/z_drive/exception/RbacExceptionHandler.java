@@ -1,4 +1,4 @@
-package com.z_team.z_drive.roles.exception;
+package com.z_team.z_drive.exception;
 
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;

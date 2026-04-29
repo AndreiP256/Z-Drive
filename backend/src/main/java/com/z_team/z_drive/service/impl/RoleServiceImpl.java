@@ -1,8 +1,6 @@
 package com.z_team.z_drive.service.impl;
 
 import com.z_team.z_drive.dto.roles.*;
-import com.z_team.z_drive.entity.User;
-import com.z_team.z_drive.repository.UserRepository;
 import com.z_team.z_drive.entity.*;
 import com.z_team.z_drive.enums.*;
 import com.z_team.z_drive.repository.*;
@@ -134,9 +132,16 @@ public class RoleServiceImpl implements RoleService {
                 .toList();
     }
 
-    @Override
+   @Override
     public List<Permission> getEffectivePermissions(UUID userId, UUID fileId) {
-        return rolePermissionsRepository.findPermissionsForUserOnFile(userId, fileId);
+        List<UsersWithFileRoles> userRoles = usersWithFileRolesRepository.findByUser_Id(userId);
+
+        return userRoles.stream()
+                .map(assignment -> assignment.getFileRole().getId())
+                .flatMap(roleId -> rolePermissionsRepository.findByFileRole_IdAndFileId(roleId, fileId).stream())
+                .map(RolePermissions::getPermission)
+                .distinct()
+                .toList();
     }
 
     // ─── Helpers ─────────────────────────────────────────

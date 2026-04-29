@@ -19,5 +19,4 @@ public interface RolePermissionsRepository extends JpaRepository<RolePermissions
 
     boolean existsByFileRole_IdAndFileIdAndPermission(UUID fileRoleId, UUID fileId, Permission permission);
 
-    List<Permission> findPermissionsForUserOnFile(UUID userId, UUID fileId);
 }
