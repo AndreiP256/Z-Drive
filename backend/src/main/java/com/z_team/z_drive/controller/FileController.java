@@ -5,8 +5,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.z_team.z_drive.dto.files.FileResponse;
+import com.z_team.z_drive.dto.files.FileUploadRequest;
+import com.z_team.z_drive.dto.user.UserResponse;
 import com.z_team.z_drive.entity.FileEntity;
 import com.z_team.z_drive.service.FileService;
+
+import jakarta.validation.Valid;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -26,15 +31,13 @@ public class FileController {
 
     //TO DO handle security i think
     @PostMapping(value = "/upload")
-    public ResponseEntity<FileEntity> uploadFile(
-            @RequestParam("file") MultipartFile file,
-            @RequestParam(value = "parentId", required = false) UUID parentId,
-            @RequestParam("userId") UUID userId
-            ) {
-
-        FileEntity savedFile = fileService.uploadFile(file, parentId, userId);
-        
-        return ResponseEntity.ok(savedFile);
+    public ResponseEntity<FileResponse> uploadFile(@Valid @ModelAttribute FileUploadRequest request) {
+        FileEntity uploadedFile = fileService.uploadFile(
+                request.getFile(), 
+                request.getParentDirId(), 
+                request.getUserId()
+        );
+        return ResponseEntity.ok(mapToResponse(uploadedFile));
     }
     
     // Getting list of filenames that have been uploaded
@@ -85,5 +88,16 @@ public class FileController {
         // Checking whether the file requested for download exists or not
         return ResponseEntity.ok("File " + filename + " downloaded successfully!");
         
+    }
+
+    private FileResponse mapToResponse(FileEntity file) {
+        return FileResponse.builder()
+                .id(file.getId())
+                .name(file.getName())
+                .type(file.getType())
+                .size(file.getSize())
+                .parentId(file.getParentId())
+                .ownerId(file.getOwnerId())
+                .build();
     }
 }

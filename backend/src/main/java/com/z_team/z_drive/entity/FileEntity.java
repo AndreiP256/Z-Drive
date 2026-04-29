@@ -12,7 +12,6 @@ import java.util.UUID;
 public class FileEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @Column(name = "file_location", nullable = false)
@@ -30,8 +29,8 @@ public class FileEntity {
     @Column(name = "owner_id", nullable = false)
     private UUID ownerId;
 
-    @Column(name = "parent")
-    private UUID parent;
+    @Column(name = "parent_id")
+    private UUID parentId;
 
     @Column(name = "is_folder", nullable = false)
     private Boolean isFolder;

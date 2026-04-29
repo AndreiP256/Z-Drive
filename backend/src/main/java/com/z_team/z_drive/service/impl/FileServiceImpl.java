@@ -41,7 +41,7 @@ public class FileServiceImpl implements FileService {
                            @Value("${z-drive.storage.access-key}") String accessKey,
                            @Value("${z-drive.storage.secret-key}") String secretKey,
                            @Value("${z-drive.storage.bucket-name}") String bucketName) {
-                            
+
         this.fileRepository = fileRepository;
         this.bucketName = bucketName;
         
@@ -72,7 +72,8 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public FileEntity uploadFile(MultipartFile file, UUID parentDirId, UUID userId) {
-        String storageKey = UUID.randomUUID().toString(); // The "Location" in Section 3.4.1
+        UUID fileId = UUID.randomUUID();
+        String storageKey = fileId.toString();
 
         try {
             // 1. Persist the actual file CONTENT to the Storage System
@@ -85,12 +86,13 @@ public class FileServiceImpl implements FileService {
 
             // 2. Persist the METADATA to the PostgreSQL Database (Section 3.4.1)
             FileEntity entity = new FileEntity();
+            entity.setId(fileId);
             entity.setName(file.getOriginalFilename());
             entity.setSize((float) file.getSize());
             entity.setType(file.getContentType());
             entity.setFileLocation(storageKey); // Link to the S3 object
             entity.setOwnerId(userId);
-            entity.setParent(parentDirId);
+            entity.setParentId(parentDirId);
             entity.setIsFolder(false);
 
             return fileRepository.save(entity);

@@ -12,5 +12,5 @@ import java.util.UUID;
 @Repository
 public interface FileRepository extends JpaRepository<FileEntity, UUID> {
     List<FileEntity> findByOwnerId(UUID ownerId);
-    List<FileEntity> findByParent(UUID parentId);
+    List<FileEntity> findByParentId(UUID parentId);
 }
