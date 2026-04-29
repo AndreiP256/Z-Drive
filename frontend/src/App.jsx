@@ -1,8 +1,9 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ProtectedRoute } from './router/ProtectedRoute';
-import LoginPage from './pages/LoginPage';
+import LoginPage from './pages/login/LoginPage';
 import AdminPage from './pages/AdminPage';
+import NotFound from './pages/not_found/NotFound';
 
 const PrivateRoute = ({ children }) => {
     const { user } = useAuth();
@@ -34,7 +35,7 @@ function App() {
                     } />
 
                     {/* Redirecționare default */}
-                    <Route path="*" element={<Navigate to="/login" />} />
+                    <Route path="*" element={<NotFound />} />
                 </Routes>
             </BrowserRouter>
         </AuthProvider>
