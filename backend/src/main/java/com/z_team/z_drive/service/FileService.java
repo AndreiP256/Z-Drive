@@ -2,6 +2,7 @@ package com.z_team.z_drive.service;
 
 import com.z_team.z_drive.entity.FileEntity;
 
+import java.io.InputStream;
 import java.util.List;
 import java.util.UUID;
 
@@ -14,8 +15,6 @@ public interface FileService {
         void deleteFile(UUID fileId);
     
         FileEntity getFile(UUID fileId);
-    
-        List<FileEntity> listFiles();
 
         FileEntity replace(UUID uuid, MultipartFile file);
 
@@ -24,4 +23,11 @@ public interface FileService {
         FileEntity move(UUID uuid, UUID newParentId);
 
         FileEntity createFolder(UUID parentDirId, UUID userId, String folderName);
+
+        List<FileEntity> listOwnedFiles(UUID userId);
+
+        List<FileEntity> listAccessibleFiles(UUID userId);
+
+        InputStream downloadFile(UUID fileId);
+
 }
