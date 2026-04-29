@@ -14,7 +14,7 @@ public class FileEntity {
     @Id
     private UUID id;
 
-    @Column(name = "file_location", nullable = false)
+    @Column(name = "file_location", nullable = true)
     private String fileLocation;
 
     @Column(nullable = false)

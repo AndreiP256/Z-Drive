@@ -5,6 +5,7 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -71,6 +72,7 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
+    @Transactional
     public FileEntity uploadFile(MultipartFile file, UUID parentDirId, UUID userId) {
         UUID fileId = UUID.randomUUID();
         String storageKey = fileId.toString();
@@ -111,14 +113,82 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public void deleteFile(UUID fileId) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'deleteFile'");
+        boolean isFolder = fileRepository.findById(fileId)
+            .orElseThrow(() -> new RuntimeException("File not found"))
+            .getIsFolder();
+        fileRepository.deleteById(fileId);
+
+        // Its not saved on the physical storage
+        if (isFolder) return; 
+
+        try {
+            s3Client.deleteObject(request -> 
+            request
+                .bucket(bucketName)
+                .key(fileId.toString()));
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to delete file from storage", e);
+        }
     }
 
     @Override
     public List<FileEntity> listFiles() {
         // TODO Auto-generated method stub
+        
         return null;
     }
 
+    @Override
+    @Transactional
+    public FileEntity replace(UUID uuid, MultipartFile file) {
+        FileEntity fileEntity = fileRepository.findById(uuid)
+            .orElseThrow(() -> new RuntimeException("File not found"));
+
+        try {
+            s3Client.putObject(PutObjectRequest.builder()
+                    .bucket(bucketName)
+                    .key(fileEntity.getId().toString())
+                    .contentType(file.getContentType())
+                    .build(), 
+                    RequestBody.fromInputStream(file.getInputStream(), file.getSize()));
+            fileEntity.setSize((float) file.getSize());
+            fileEntity.setName(file.getOriginalFilename());
+            fileEntity.setType(file.getContentType());
+            return fileEntity; 
+        } catch (IOException e) {
+            throw new RuntimeException("Replacement failed", e);
+        }
+    }
+
+    @Override
+    @Transactional
+    public FileEntity rename(UUID uuid, String newName) {
+        FileEntity file = fileRepository.findById(uuid)
+            .orElseThrow(() -> new RuntimeException("File not found"));
+        file.setName(newName);
+        return file;
+    }
+
+    @Override
+    @Transactional
+    public FileEntity move(UUID uuid, UUID newParentId) {
+        FileEntity file = fileRepository.findById(uuid)
+            .orElseThrow(() -> new RuntimeException("File not found"));
+        file.setParentId(newParentId);
+        return file;
+    }
+
+    @Override
+    public FileEntity createFolder(UUID parentDirId, UUID userId, String folderName) {
+        FileEntity folder = new FileEntity();
+        folder.setId(UUID.randomUUID());
+        folder.setName(folderName);
+        folder.setSize(0f);
+        folder.setType("folder");
+        folder.setFileLocation(null);
+        folder.setOwnerId(userId);
+        folder.setParentId(parentDirId);
+        folder.setIsFolder(true);
+        return fileRepository.save(folder);
+    }
 }

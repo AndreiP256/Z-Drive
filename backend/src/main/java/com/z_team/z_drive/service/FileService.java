@@ -16,4 +16,12 @@ public interface FileService {
         FileEntity getFile(UUID fileId);
     
         List<FileEntity> listFiles();
+
+        FileEntity replace(UUID uuid, MultipartFile file);
+
+        FileEntity rename(UUID uuid, String newName);
+
+        FileEntity move(UUID uuid, UUID newParentId);
+
+        FileEntity createFolder(UUID parentDirId, UUID userId, String folderName);
 }
