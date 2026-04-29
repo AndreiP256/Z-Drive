@@ -1,0 +1,32 @@
+services:
+  db:
+    image: postgres:15
+    container_name: zdrive-db
+    environment:
+      POSTGRES_DB: zdrive
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: pass123
+    ports:
+      - "5432:5432"
+    # This command runs the original entrypoint but adds the user creation logic
+    command: 
+      - "postgres"
+      - "-c"
+      - "config_file=/etc/postgresql/postgresql.conf"
+    # We use a shell script trick to inject the admin user creation
+    entrypoint: >
+      sh -c "
+      (sleep 10 && psql -U postgres -d zdrive -c \"CREATE USER admin WITH PASSWORD 'admin123'; GRANT ALL PRIVILEGES ON DATABASE zdrive TO admin; ALTER DATABASE zdrive OWNER TO admin;\") &
+      exec docker-entrypoint.sh postgres
+      "
+
+  zdrive-storage:
+    image: minio/minio
+    container_name: zdrive-storage
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: admin
+      MINIO_ROOT_PASSWORD: password123
+    command: server /data --console-address ":9001"
