@@ -1,6 +1,14 @@
 package com.z_team.z_drive.controller;
 
 import com.z_team.z_drive.dto.roles.*;
+import com.z_team.z_drive.dto.roles.requests.AssignRoleRequest;
+import com.z_team.z_drive.dto.roles.requests.CreateFileRoleRequest;
+import com.z_team.z_drive.dto.roles.requests.PermissionRequest;
+import com.z_team.z_drive.dto.roles.requests.RevokeRoleRequest;
+import com.z_team.z_drive.dto.roles.requests.UpdateFileRoleRequest;
+import com.z_team.z_drive.dto.roles.responses.FileRoleResponse;
+import com.z_team.z_drive.dto.roles.responses.RevokeRoleResponse;
+import com.z_team.z_drive.dto.roles.responses.UserRoleResponse;
 import com.z_team.z_drive.enums.Permission;
 import com.z_team.z_drive.service.RoleService;
 import lombok.RequiredArgsConstructor;
@@ -13,14 +21,14 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/roles")
+@RequestMapping("/roles")
 @RequiredArgsConstructor
 public class RoleController {
 
     private final RoleService roleService;
 
     @PostMapping
-    @PreAuthorize("hasAuthority('ADMIN')")
+    //@PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
     public ResponseEntity<FileRoleResponse> createFileRole(
             @RequestBody CreateFileRoleRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -33,7 +41,7 @@ public class RoleController {
     }
 
     @PutMapping("/{roleId}")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    //@PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
     public ResponseEntity<FileRoleResponse> updateFileRole(
             @PathVariable UUID roleId,
             @RequestBody UpdateFileRoleRequest request) {
@@ -41,7 +49,7 @@ public class RoleController {
     }
 
     @DeleteMapping("/{roleId}")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    //@PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
     public ResponseEntity<Void> deleteFileRole(@PathVariable UUID roleId) {
         roleService.deleteFileRole(roleId);
         return ResponseEntity.noContent().build();
@@ -53,20 +61,18 @@ public class RoleController {
     }
 
     @PostMapping("/assign")
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'MANAGER')")
+    //@PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
     public ResponseEntity<UserRoleResponse> assignRole(
             @RequestBody AssignRoleRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(roleService.assignRoleToUser(request));
     }
 
-    @DeleteMapping("/assign")
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'MANAGER')")
-    public ResponseEntity<Void> revokeRole(
-            @RequestParam UUID userId,
-            @RequestParam UUID fileRoleId) {
-        roleService.revokeRoleFromUser(userId, fileRoleId);
-        return ResponseEntity.noContent().build();
+    @DeleteMapping("/revoke")
+    //@PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
+    public ResponseEntity<RevokeRoleResponse> revokeRole(
+            @RequestBody RevokeRoleRequest request) {
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(roleService.revokeRoleFromUser(request));
     }
 
     @GetMapping("/users/{userId}")
@@ -76,8 +82,7 @@ public class RoleController {
 
     @GetMapping("/permissions")
     public ResponseEntity<List<Permission>> getEffectivePermissions(
-            @RequestParam UUID userId,
-            @RequestParam UUID fileId) {
-        return ResponseEntity.ok(roleService.getEffectivePermissions(userId, fileId));
+           @RequestBody PermissionRequest request) {
+        return ResponseEntity.ok(roleService.getEffectivePermissions(request));
     }
 }

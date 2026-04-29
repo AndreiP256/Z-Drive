@@ -1,6 +1,14 @@
 package com.z_team.z_drive.service.impl;
 
 import com.z_team.z_drive.dto.roles.*;
+import com.z_team.z_drive.dto.roles.requests.AssignRoleRequest;
+import com.z_team.z_drive.dto.roles.requests.CreateFileRoleRequest;
+import com.z_team.z_drive.dto.roles.requests.PermissionRequest;
+import com.z_team.z_drive.dto.roles.requests.RevokeRoleRequest;
+import com.z_team.z_drive.dto.roles.requests.UpdateFileRoleRequest;
+import com.z_team.z_drive.dto.roles.responses.FileRoleResponse;
+import com.z_team.z_drive.dto.roles.responses.RevokeRoleResponse;
+import com.z_team.z_drive.dto.roles.responses.UserRoleResponse;
 import com.z_team.z_drive.entity.*;
 import com.z_team.z_drive.enums.*;
 import com.z_team.z_drive.repository.*;
@@ -117,11 +125,17 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     @Transactional
-    public void revokeRoleFromUser(UUID userId, UUID fileRoleId) {
+    public RevokeRoleResponse revokeRoleFromUser(RevokeRoleRequest request) {
+        UUID userId = request.getUserId();
+        UUID fileRoleId = request.getFileRoleId();
         usersWithFileRolesRepository.findByUser_Id(userId).stream()
                 .filter(u -> u.getFileRole().getId().equals(fileRoleId))
                 .findFirst()
                 .ifPresent(usersWithFileRolesRepository::delete);
+        return RevokeRoleResponse.builder()
+            .userId(userId)
+            .fileRoleId(fileRoleId)
+            .build();
     }
 
     @Override
@@ -133,7 +147,9 @@ public class RoleServiceImpl implements RoleService {
     }
 
    @Override
-    public List<Permission> getEffectivePermissions(UUID userId, UUID fileId) {
+    public List<Permission> getEffectivePermissions(PermissionRequest request) {
+        UUID userId = request.getUserId();
+        UUID fileId = request.getFileId();
         List<UsersWithFileRoles> userRoles = usersWithFileRolesRepository.findByUser_Id(userId);
 
         return userRoles.stream()
