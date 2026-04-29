@@ -8,57 +8,96 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
+import java.net.URI;
 import java.util.List;
 
 import com.z_team.z_drive.entity.FileEntity;
 import com.z_team.z_drive.repository.FileRepository;
 import com.z_team.z_drive.service.FileService;
 
+import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
+import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
+import software.amazon.awssdk.auth.signer.AwsS3V4Signer;
+import software.amazon.awssdk.core.client.config.ClientOverrideConfiguration;
+import software.amazon.awssdk.core.client.config.SdkAdvancedClientOption;
+import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.CreateBucketRequest;
+import software.amazon.awssdk.services.s3.model.HeadBucketRequest;
+import software.amazon.awssdk.services.s3.model.NoSuchBucketException;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+
 @Service
 public class FileServiceImpl implements FileService {
 
     private final FileRepository fileRepository;
-    private final Path rootLocation;
+    private final String bucketName;
+    private final S3Client s3Client;
 
     @Autowired
     public FileServiceImpl(FileRepository fileRepository, 
-                           @Value("${z-drive.storage.location}") String storageLocation) {
+                           @Value("${z-drive.storage.endpoint}") String endpoint,
+                           @Value("${z-drive.storage.access-key}") String accessKey,
+                           @Value("${z-drive.storage.secret-key}") String secretKey,
+                           @Value("${z-drive.storage.bucket-name}") String bucketName) {
+                            
         this.fileRepository = fileRepository;
-        this.rootLocation = Paths.get(storageLocation);
+        this.bucketName = bucketName;
+        
+        // Initialize the connection to the "Dedicated Storage"
+        this.s3Client = S3Client.builder()
+                .endpointOverride(URI.create(endpoint))
+                .credentialsProvider(StaticCredentialsProvider.create(
+                        AwsBasicCredentials.create(accessKey, secretKey)))
+                .region(Region.EU_CENTRAL_1)
+                .forcePathStyle(true)
+                .overrideConfiguration(ClientOverrideConfiguration.builder()
+                    .putAdvancedOption(SdkAdvancedClientOption.SIGNER, AwsS3V4Signer.create())
+                    .build())
+                .build();
+
+        try {
+            HeadBucketRequest headBucketRequest = HeadBucketRequest.builder()
+                    .bucket(bucketName)
+                    .build();
+            s3Client.headBucket(headBucketRequest);
+        } catch (NoSuchBucketException e) {
+            s3Client.createBucket(CreateBucketRequest.builder()
+                    .bucket(bucketName)
+                    .build());
+            System.out.println("Created missing bucket: " + bucketName);
+        }
     }
 
     @Override
     public FileEntity uploadFile(MultipartFile file, UUID parentDirId, UUID userId) {
-        String filename = file.getOriginalFilename();
-        Path destinationFile = this.rootLocation.resolve(Paths.get(filename)).normalize().toAbsolutePath();
+        String storageKey = UUID.randomUUID().toString(); // The "Location" in Section 3.4.1
 
-        // TO DO handle folder logic, and change the path
         try {
-            // Check if directory exists, if not, create it
-            if (!Files.exists(rootLocation)) {
-                Files.createDirectories(rootLocation);
-            }
+            // 1. Persist the actual file CONTENT to the Storage System
+            s3Client.putObject(PutObjectRequest.builder()
+                    .bucket(bucketName)
+                    .key(storageKey)
+                    .contentType(file.getContentType())
+                    .build(), 
+                    RequestBody.fromInputStream(file.getInputStream(), file.getSize()));
 
-            Files.copy(file.getInputStream(),  destinationFile, StandardCopyOption.REPLACE_EXISTING);
-            
+            // 2. Persist the METADATA to the PostgreSQL Database (Section 3.4.1)
+            FileEntity entity = new FileEntity();
+            entity.setName(file.getOriginalFilename());
+            entity.setSize((float) file.getSize());
+            entity.setType(file.getContentType());
+            entity.setFileLocation(storageKey); // Link to the S3 object
+            entity.setOwnerId(userId);
+            entity.setParent(parentDirId);
+            entity.setIsFolder(false);
+
+            return fileRepository.save(entity);
+
         } catch (IOException e) {
-            throw new RuntimeException("Could not store file. Error: " + e.getMessage());
+            throw new RuntimeException("Storage System Unreachable", e);
         }
-
-        FileEntity entity = new FileEntity();
-        entity.setName(file.getOriginalFilename());
-        entity.setSize((float) file.getSize());
-        entity.setType(file.getContentType());
-        entity.setFileLocation(destinationFile.toString());
-        entity.setParent(parentDirId);
-        entity.setIsFolder(false);
-        entity.setOwnerId(userId);
-
-        return fileRepository.save(entity);
     }
 
     @Override
