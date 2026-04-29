@@ -1,10 +1,15 @@
 package com.z_team.z_drive.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.z_team.z_drive.dto.files.DowloadRequest;
 import com.z_team.z_drive.dto.files.FileResponse;
 import com.z_team.z_drive.dto.files.FileUploadRequest;
 import com.z_team.z_drive.dto.files.FolderCreateRequest;
@@ -17,6 +22,7 @@ import jakarta.validation.Valid;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.UUID;
 
 
@@ -71,7 +77,7 @@ public class FileController {
         return ResponseEntity.ok("File with id " + uuid + " deleted successfully!");
     }
 
-    @PatchMapping("/{uuid}/rename")
+    @PatchMapping("/rename/{uuid}")
     public ResponseEntity<FileResponse> renameFile(
         @PathVariable UUID uuid, 
         @RequestBody RenameRequest request) {
@@ -80,7 +86,7 @@ public class FileController {
         return ResponseEntity.ok(mapToResponse(updated));
     }
 
-    @PatchMapping("/{uuid}/move")
+    @PatchMapping("/move/{uuid}")
     public ResponseEntity<FileResponse> moveFile(
         @PathVariable UUID uuid, 
         @RequestBody MoveRequest request) {
@@ -89,7 +95,7 @@ public class FileController {
         return ResponseEntity.ok(mapToResponse(updated));
     }
 
-    @PutMapping("/{uuid}/replace")
+    @PutMapping("/replace/{uuid}")
     public ResponseEntity<FileResponse> replaceFile(
         @PathVariable UUID uuid, 
         @RequestParam("file") MultipartFile file) {
@@ -104,24 +110,25 @@ public class FileController {
         return ResponseEntity.ok(true);
     }
 
-    @PatchMapping("/{uuid}/permissions")
+    @PatchMapping("/permissions/{uuid}")
     public ResponseEntity<File> changePermissions() {
         // change permissions logic
         return ResponseEntity.ok(new File("dummy"));
 
     }
 
-    @GetMapping("/test")
-    public ResponseEntity<String> test() {
-        return ResponseEntity.ok("Hello world!");
-    }
     
-    // Downloading a file
-    @GetMapping("/download/{path}")
-    public ResponseEntity<String> downloadFile(@PathVariable("path") String filename) throws FileNotFoundException {
-        // Checking whether the file requested for download exists or not
-        return ResponseEntity.ok("File " + filename + " downloaded successfully!");
-        
+    @GetMapping("/download/{uuid}")
+    public ResponseEntity<Resource> downloadFile(@PathVariable UUID uuid) {
+        FileEntity fileEntity = fileService.getFile(uuid);
+        InputStream inputStream = fileService.downloadFile(uuid);
+    
+        InputStreamResource resource = new InputStreamResource(inputStream);
+
+    return ResponseEntity.ok()
+            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileEntity.getName() + "\"")
+            .contentType(MediaType.parseMediaType(fileEntity.getType()))
+            .body(resource);
     }
 
     private FileResponse mapToResponse(FileEntity file) {

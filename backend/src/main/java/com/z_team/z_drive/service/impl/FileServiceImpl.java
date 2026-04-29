@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.util.List;
 
@@ -22,6 +23,7 @@ import software.amazon.awssdk.auth.signer.AwsS3V4Signer;
 import software.amazon.awssdk.core.client.config.ClientOverrideConfiguration;
 import software.amazon.awssdk.core.client.config.SdkAdvancedClientOption;
 import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.core.sync.ResponseTransformer;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.CreateBucketRequest;
@@ -46,7 +48,6 @@ public class FileServiceImpl implements FileService {
         this.fileRepository = fileRepository;
         this.bucketName = bucketName;
         
-        // Initialize the connection to the "Dedicated Storage"
         this.s3Client = S3Client.builder()
                 .endpointOverride(URI.create(endpoint))
                 .credentialsProvider(StaticCredentialsProvider.create(
@@ -78,15 +79,12 @@ public class FileServiceImpl implements FileService {
         String storageKey = fileId.toString();
 
         try {
-            // 1. Persist the actual file CONTENT to the Storage System
             s3Client.putObject(PutObjectRequest.builder()
                     .bucket(bucketName)
                     .key(storageKey)
                     .contentType(file.getContentType())
                     .build(), 
                     RequestBody.fromInputStream(file.getInputStream(), file.getSize()));
-
-            // 2. Persist the METADATA to the PostgreSQL Database (Section 3.4.1)
             FileEntity entity = new FileEntity();
             entity.setId(fileId);
             entity.setName(file.getOriginalFilename());
@@ -106,8 +104,8 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public FileEntity getFile(UUID fileId) {
-        // TODO Auto-generated method stub
-        return null;
+        return fileRepository.findById(fileId)
+            .orElseThrow(() -> new RuntimeException("File not found"));
     }
 
 
@@ -118,7 +116,6 @@ public class FileServiceImpl implements FileService {
             .getIsFolder();
         fileRepository.deleteById(fileId);
 
-        // Its not saved on the physical storage
         if (isFolder) return; 
 
         try {
@@ -132,10 +129,13 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public List<FileEntity> listFiles() {
-        // TODO Auto-generated method stub
-        
-        return null;
+    public List<FileEntity> listOwnedFiles(UUID userId) {
+        return fileRepository.findByOwnerId(userId);
+    }
+
+    @Override
+    public List<FileEntity> listAccessibleFiles(UUID userId) {
+        return fileRepository.findByOwnerId(userId);
     }
 
     @Override
@@ -190,5 +190,17 @@ public class FileServiceImpl implements FileService {
         folder.setParentId(parentDirId);
         folder.setIsFolder(true);
         return fileRepository.save(folder);
+    }
+
+
+    @Override
+    public InputStream downloadFile(UUID fileId) {
+        FileEntity file = fileRepository.findById(fileId)
+                .orElseThrow(() -> new RuntimeException("File not found"));
+
+        return s3Client.getObject(req -> req
+                .bucket(bucketName)
+                .key(file.getFileLocation()), 
+                ResponseTransformer.toInputStream());
     }
 }
