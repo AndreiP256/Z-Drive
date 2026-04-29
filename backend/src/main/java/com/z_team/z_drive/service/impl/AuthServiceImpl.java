@@ -31,7 +31,11 @@ public class AuthServiceImpl implements AuthService {
             throw new BadCredentialsException("Email sau parolă incorectă");
         }
         
-        String token = jwtService.generateToken(user.getEmail(), List.of(user.getRole().name()));
+        String token = jwtService.generateToken(
+            user.getId(),
+            user.getEmail(), 
+            List.of(user.getRole().name())
+        );
 
         return new LoginResponse(token);
     }

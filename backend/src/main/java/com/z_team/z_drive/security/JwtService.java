@@ -12,6 +12,7 @@ import java.sql.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
 import java.util.function.Function;
@@ -39,14 +40,20 @@ public class JwtService {
         return claimsResolver.apply(claims);
     }
 
+    public UUID extractUserId(String token) {
+        String userIdString = extractClaim(token, claims -> claims.get("userId", String.class));
+        return UUID.fromString(userIdString);
+    }
+
     private SecretKey getSignInKey() {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String generateToken(String username, List<String> roles) {
+    public String generateToken(UUID userId, String username, List<String> roles) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("roles", roles);
+        claims.put("userId", userId.toString());
 
         return Jwts.builder()
                 .claims(claims)

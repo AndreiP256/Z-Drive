@@ -14,6 +14,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
@@ -41,6 +42,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 List<String> roles = jwtService.extractRoles(jwt);
+                UUID userId = jwtService.extractUserId(jwt);
+
+                UserPrincipal principal = new UserPrincipal(userId, userEmail);
                 
                 // Prefix with ROLE_ for @PreAuthorize("hasRole('...')") to work
                 List<SimpleGrantedAuthority> authorities = roles.stream()
@@ -48,7 +52,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         .toList();
 
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                        userEmail,
+                        principal,
                         null,
                         authorities
                 );

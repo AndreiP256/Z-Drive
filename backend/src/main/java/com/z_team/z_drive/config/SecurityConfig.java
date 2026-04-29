@@ -28,19 +28,17 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf.disable()) // Required for APIs
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/auth/**").permitAll() // Allow Login/Register without auth
-                .anyRequest().authenticated()               // Secure everything else
+                .requestMatchers("/auth/**").permitAll()
+                .anyRequest().authenticated() 
                 // .anyRequest().permitAll()
             )
             .sessionManagement(session -> session
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)); // Tell Spring not to create sessions
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
             http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
             
         return http.build();
     }
 
-    // You already have a PasswordManagerImpl, but Spring Security 
-    // needs a PasswordEncoder bean to handle internal checks.
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
