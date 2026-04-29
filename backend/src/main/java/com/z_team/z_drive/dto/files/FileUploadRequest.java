@@ -17,7 +17,4 @@ public class FileUploadRequest {
     private MultipartFile file;
 
     private UUID parentDirId;
-
-    @NotNull(message = "User ID is required")
-    private UUID userId;
 }
