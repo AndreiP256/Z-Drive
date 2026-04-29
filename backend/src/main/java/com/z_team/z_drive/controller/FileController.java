@@ -9,7 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.z_team.z_drive.dto.files.DowloadRequest;
 import com.z_team.z_drive.dto.files.FileResponse;
 import com.z_team.z_drive.dto.files.FileUploadRequest;
 import com.z_team.z_drive.dto.files.FolderCreateRequest;
@@ -21,7 +20,6 @@ import com.z_team.z_drive.service.FileService;
 import jakarta.validation.Valid;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.UUID;
 
