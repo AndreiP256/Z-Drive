@@ -28,7 +28,7 @@ public class RoleController {
     private final RoleService roleService;
 
     @PostMapping
-    //@PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
     public ResponseEntity<FileRoleResponse> createFileRole(
             @RequestBody CreateFileRoleRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -41,7 +41,7 @@ public class RoleController {
     }
 
     @PutMapping("/{roleId}")
-    //@PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
     public ResponseEntity<FileRoleResponse> updateFileRole(
             @PathVariable UUID roleId,
             @RequestBody UpdateFileRoleRequest request) {
@@ -49,7 +49,7 @@ public class RoleController {
     }
 
     @DeleteMapping("/{roleId}")
-    //@PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
     public ResponseEntity<Void> deleteFileRole(@PathVariable UUID roleId) {
         roleService.deleteFileRole(roleId);
         return ResponseEntity.noContent().build();
@@ -61,7 +61,7 @@ public class RoleController {
     }
 
     @PostMapping("/assign")
-    //@PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
     public ResponseEntity<UserRoleResponse> assignRole(
             @RequestBody AssignRoleRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -69,7 +69,7 @@ public class RoleController {
     }
 
     @DeleteMapping("/revoke")
-    //@PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
     public ResponseEntity<RevokeRoleResponse> revokeRole(
             @RequestBody RevokeRoleRequest request) {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(roleService.revokeRoleFromUser(request));
