@@ -4,6 +4,7 @@ import { ProtectedRoute } from './router/ProtectedRoute';
 import LoginPage from './pages/login/LoginPage';
 import AdminPage from './pages/AdminPage';
 import NotFound from './pages/not_found/NotFound';
+import AdminDashboard from './pages/admin-dashboard/AdminDashboard';
 
 const PrivateRoute = ({ children }) => {
     const { user } = useAuth();
@@ -30,7 +31,7 @@ function App() {
                     {/* Rute de Admin */}
                     <Route path="/admin-panel" element={
                         <ProtectedRoute allowedRoles={['ADMIN']}>
-                            <AdminPage />
+                            <AdminDashboard />
                         </ProtectedRoute>
                     } />
 
