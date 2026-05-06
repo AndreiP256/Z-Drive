@@ -39,7 +39,7 @@ public class FilePermissionEvaluator {
             return true;
         }
 
-        PermissionRequest permissionRequest = new PermissionRequest(fileId, currentUserId);
+        PermissionRequest permissionRequest = new PermissionRequest(currentUserId, fileId);
         List<Permission> permissions = roleService.getEffectivePermissions(permissionRequest);
         if ("WRITE".equals(permissionType)) {
             return permissions.contains(Permission.WRITE);
