@@ -1,6 +1,10 @@
 import { EditIcon, TrashIcon} from 'lucide-react';
 import './UserPage.css';
-const User = ({ user }) => {
+import { useState, useEffect } from 'react';
+import { deleteUser } from '../../api/usersApi';
+const possibleStatuses = ['Active', 'Inactive'];
+const status = possibleStatuses[Math.floor(Math.random() * 2)];
+const User = ({ user, onDelete }) => {
     return (
         <tr className="users-table-body-row">
             <td className="users-table-cell name-cell">{user.name}</td>
@@ -9,13 +13,15 @@ const User = ({ user }) => {
                 <span className="role-badge">{user.role}</span>
             </td>
             <td className="users-table-cell">
-                <span className={`users-status-badge users-status-${user.status.toLowerCase()}`}>
-                    {user.status}
+                <span className={`users-status-badge users-status-${status.toLowerCase()}`}>
+                    {status}
                 </span>
             </td>
             <td className="users-table-cell users-table-actions-cell">
                 <button className="users-action-button" ><EditIcon className="user-action-icon" /></button>
-                <button className="users-action-button"><TrashIcon className="user-action-icon" /></button>
+                <button className="users-action-button" onClick={() => onDelete(user.id)}>
+                    <TrashIcon className="user-action-icon" />
+                </button>
             </td>
         </tr>
     );
