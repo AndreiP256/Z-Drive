@@ -14,7 +14,7 @@ const DashboardLayout = () => {
                 </main>
             </div>
             <footer className="footer-copyright">
-                <p>© 2024 Z-Drive Enterprise. All rights reserved.</p>
+                <p>© 2026 Z-Drive Enterprise. All rights reserved.</p>
             </footer>
         </div>
     );

@@ -5,7 +5,6 @@ import LoginPage from './pages/login/LoginPage';
 import AdminPage from './pages/AdminPage';
 import Dashboard from './pages/dashboard/Dashboard';
 import NotFound from './pages/not_found/NotFound';
-import Dashboard from './pages/dashboard/Dashboard';
 import AdminDashboard from './pages/admin-dashboard/AdminDashboard';
 import DashboardLayout from './pages/dashboard/DashboardLayout';
 
@@ -29,7 +28,6 @@ function App() {
                         <DashboardLayout />
                     </ProtectedRoute>
                 }>
-                    {/* Toate aceste rute vor avea Sidebar și Header automat */}
                     <Route path="/dashboard" element={<Dashboard />} />
                     
                     {/* Rută protejată suplimentar prin rol */}

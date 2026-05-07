@@ -18,8 +18,13 @@ const LoginPage = () => {
     const handleSubmit = async (values, { setSubmitting, setStatus }) => {
         try {
             const response = await api.post('/auth/login', values);
-            login(response.data.token);
-            navigate('/dashboard');
+            const success = await login(response.data.token);
+            
+            if (success) {
+                navigate('/dashboard');
+            } else {
+                setStatus({ error: "Eroare la verificarea profilului" });
+            }
         } catch (err) {
             setStatus({ error: "Email sau parolă incorectă" });
         } finally {

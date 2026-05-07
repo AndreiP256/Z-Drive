@@ -1,76 +1,80 @@
-:root {
-    --bg-gray: #f8fafc;
-    --primary-blue: #0052cc;
-    --text-main: #1e293b;
-    --text-muted: #64748b;
-    --border-color: #e2e8f0;
+.page-container {
+    width: 100%;
+    /* Eliminăm max-width fix de aici pentru că e gestionat de Layout */
 }
 
-.dashboard-wrapper {
-    background-color: var(--bg-gray);
-    min-height: 100vh;
-    padding: 40px 20px;
-}
-
-.dashboard-container {
-    max-width: 1100px;
-    margin: 0 auto;
-}
-
-.dashboard-header {
+.page-header {
     display: flex;
     justify-content: space-between;
-    align-items: flex-end;
-    margin-bottom: 30px;
+    align-items: center;
+    margin-bottom: 32px;
 }
 
-.header-text h1 {
+.page-header h1 {
     font-size: 28px;
-    color: var(--text-main);
-    margin: 0 0 8px 0;
-}
-
-.header-text p {
-    color: var(--text-muted);
+    font-weight: 700;
+    color: #111827;
     margin: 0;
 }
 
-.upload-main-btn {
-    background-color: var(--primary-blue);
+.upload-btn {
+    background-color: #0061FE;
     color: white;
-    border: none;
-    padding: 12px 24px;
+    padding: 10px 20px;
     border-radius: 8px;
     font-weight: 600;
+    border: none;
     cursor: pointer;
-    transition: 0.2s;
 }
 
-.upload-main-btn:hover { background-color: #0747a6; }
-
-.file-list-card {
+.file-card {
     background: white;
+    border: 1px solid #eaecf0;
     border-radius: 12px;
-    border: 1px solid var(--border-color);
-    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
-    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
 
-.file-table-header {
+/* ALINIERE PERFECTĂ COLOANE */
+.file-header-row {
     display: grid;
-    grid-template-columns: 2fr 1fr 1fr 0.5fr;
-    padding: 16px 24px;
-    background: #f1f5f9;
-    font-size: 11px;
-    font-weight: 700;
-    color: var(--text-muted);
-    letter-spacing: 0.05em;
+    /* Numele ia tot spațiul, restul coloanelor sunt fixe */
+    grid-template-columns: 1fr 120px 180px 80px; 
+    gap: 20px;
+    padding: 12px 24px;
+    background: #f9fafb;
+    border-bottom: 1px solid #eaecf0;
+    font-size: 12px;
+    font-weight: 600;
+    color: #667085;
 }
 
 .text-right { text-align: right; }
 
-.empty-state {
-    padding: 50px;
+.empty-state-container {
+    grid-column: 1 / -1; /* Ocupă toate coloanele tabelului */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
     text-align: center;
-    color: var(--text-muted);
+    color: #667085;
+}
+
+.empty-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+    opacity: 0.5;
+}
+
+.empty-state-container p {
+    font-weight: 600;
+    font-size: 16px;
+    margin: 0;
+    color: #101828;
+}
+
+.empty-state-container span {
+    font-size: 14px;
+    margin-top: 4px;
 }

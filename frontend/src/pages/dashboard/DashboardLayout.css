@@ -1,17 +1,42 @@
-
+/* Containerul principal care ocupă tot ecranul */
 .dashboard-container {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    height: 100vh; /* Forțează layout-ul să fie fix la înălțimea ecranului */
+    overflow: hidden; /* Previne scroll-ul pe toată pagina */
 }
 
+/* Header-ul rămâne sus */
+.dashboard-header {
+    height: 70px;
+    flex-shrink: 0; /* Îl împiedică să se strângă */
+    background: white;
+    border-bottom: 1px solid #eaecf0;
+}
+
+/* Corpul care conține Sidebar + Main Content */
 .dashboard-body {
-  display: flex;
-  flex: 1;
+    display: flex;
+    flex: 1; /* Ocupă restul spațiului de sub header */
+    overflow: hidden; /* Critic: corpul în sine nu are scroll */
 }
 
+/* SIDEBAR - Fix și fără scroll */
+.sidebar {
+    width: 260px;
+    height: 100%; /* Ocupă tot DashboardBody */
+    flex-shrink: 0; /* Nu se strânge când fereastra e mică */
+    background-color: white;
+    border-right: 1px solid #eaecf0;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto; /* Permite scroll DOAR dacă ai prea multe butoane în meniu */
+}
+
+/* ZONA DE CONȚINUT (Unde sunt fișierele) */
 .dashboard-content {
-  flex: 1;
-  overflow-y: auto;
-  padding: 1.5rem;
+    flex: 1; /* Ocupă tot spațiul rămas la dreapta */
+    background-color: #f9fafb;
+    overflow-y: auto; /* DOAR aici vrem scroll când lista de fișiere e lungă */
+    padding: 32px;
 }

@@ -31,9 +31,19 @@ export const AuthProvider = ({ children }) => {
         checkAuth();
     }, []);
 
-    const login = (token) => {
+    const login = async (token) => {
         localStorage.setItem('token', token);
-        checkAuth(); // Verificăm imediat după login pentru a lua datele user-ului
+        api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        
+        try {
+            const response = await api.get('/users/me');
+            setUser(response.data);
+            return true; // Confirmăm succesul
+        } catch (error) {
+            localStorage.removeItem('token');
+            setUser(null);
+            return false;
+        }
     };
 
     const logout = () => {
