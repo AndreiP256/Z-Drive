@@ -29,7 +29,7 @@ function App() {
                     } />
 
                     {/* Rute de Admin */}
-                    <Route path="/admin-panel" element={
+                    <Route path="/dashboard/users" element={
                         <ProtectedRoute allowedRoles={['ADMIN']}>
                             <AdminDashboard />
                         </ProtectedRoute>

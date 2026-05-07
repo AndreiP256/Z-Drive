@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../api/axios';
 import AdminHeader from './components/AdminHeader';
+import AdminSidebar from './components/AdminSidebar';
 
 const AdminDashboard = () => {
     const { user } = useAuth();
@@ -41,29 +42,18 @@ const AdminDashboard = () => {
     // };
 
     return (
-        <div className="flex h-screen bg-surface">
-            {/* <AdminSidebar />
-             */}
-            <div className="flex-1 flex flex-col ml-64">
-                <AdminHeader onCreateUserClick={() => setShowCreateModal(true)} />
-                
-                {/* <main className="flex-1 overflow-y-auto p-lg">
-                    <div className="max-w-7xl mx-auto">
-                        <UsersTable
-                            users={users}
-                            loading={loading}
-                            currentPage={currentPage}
-                            onPageChange={setCurrentPage}
-                            onDeleteUser={handleDeleteUser}
-                        />
-                    </div>
-                </main> */}
-
-                <footer className="footer-copyright">
-                    <p>© 2024 Z-Drive Enterprise. All rights reserved.</p>
-                </footer>
-            </div>
+    <div className="dashboard-container">
+        <AdminHeader />
+        <div className="dashboard-body">
+        <AdminSidebar />
+        <main className="dashboard-content">
+            {/* page content */}
+        </main>
         </div>
+        <footer className="footer-copyright">
+        <p>© 2024 Z-Drive Enterprise. All rights reserved.</p>
+        </footer>
+    </div>
     );
 };
 
