@@ -3,8 +3,10 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import { ProtectedRoute } from './router/ProtectedRoute';
 import LoginPage from './pages/login/LoginPage';
 import AdminPage from './pages/AdminPage';
+import Dashboard from './pages/dashboard/Dashboard';
 import NotFound from './pages/not_found/NotFound';
 import AdminDashboard from './pages/admin-dashboard/AdminDashboard';
+import DashboardLayout from './pages/dashboard/DashboardLayout';
 
 const PrivateRoute = ({ children }) => {
     const { user } = useAuth();
@@ -17,27 +19,29 @@ function App() {
         <AuthProvider>
             <BrowserRouter>
                 <Routes>
-                    {/* Rute Publice */}
-                    <Route path="/login" element={<LoginPage />} />
-                    <Route path="/unauthorized" element={<h1>Neautorizat</h1>} />
+                {/* Rute Publice */}
+                <Route path="/login" element={<LoginPage />} />
 
-                    {/* Rute Protejate */}
-                    <Route path="/dashboard" element={
-                        <ProtectedRoute>
-                            <h1>Bine ai venit în Z-Drive!</h1>
-                        </ProtectedRoute>
-                    } />
-
-                    {/* Rute de Admin */}
-                    <Route path="/dashboard/users" element={
+                {/* Rute Protejate cu Layout Comun */}
+                <Route element={
+                    <ProtectedRoute>
+                        <DashboardLayout />
+                    </ProtectedRoute>
+                }>
+                    {/* Toate aceste rute vor avea Sidebar și Header automat */}
+                    <Route path="/dashboard" element={<Dashboard />} />
+                    
+                    {/* Rută protejată suplimentar prin rol */}
+                    <Route path="/admin" element={
                         <ProtectedRoute allowedRoles={['ADMIN']}>
                             <AdminDashboard />
                         </ProtectedRoute>
                     } />
+                </Route>
 
-                    {/* Redirecționare default */}
-                    <Route path="*" element={<NotFound />} />
-                </Routes>
+                <Route path="/unauthorized" element={<h1>Neautorizat</h1>} />
+                <Route path="*" element={<NotFound />} />
+            </Routes>
             </BrowserRouter>
         </AuthProvider>
     );
