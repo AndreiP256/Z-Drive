@@ -15,14 +15,15 @@ const File = ({ file }) => {
     };
 
     const formatFileSize = (sizeInKb) => {
-        if (!sizeInKb || sizeInKb === 0) return '0 KB';
-        
-        if (sizeInKb >= 1024 * 1024) {
-            return (sizeInKb / (1024 * 1024)).toFixed(2) + ' GB';
-        } else if (sizeInKb >= 1024) {
-            return (sizeInKb / 1024).toFixed(2) + ' MB';
+        if (!sizeInKb || sizeInKb === 0) return '0 b';
+        if (sizeInKb >= 1024 * 1024 * 1024) {
+            return (sizeInKb / (1024 * 1024 * 1024)).toFixed(2) + ' GB';
+        } else if (sizeInKb >= 1024 * 1024) {
+            return (sizeInKb / (1024 * 1024)).toFixed(2) + ' MB';
+        }else if(sizeInKb >= 1024){
+            return (sizeInKb / 1024 ).toFixed(2) + ' KB';
         } else {
-            return Math.round(sizeInKb) + ' KB';
+            return Math.round(sizeInKb) + ' b';
         }
     };
 
