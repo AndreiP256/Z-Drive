@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "error": "#ba1a1a",
+                        "secondary-container": "#dae2fd",
+                        "primary-container": "#1a73e8",
+                        "on-secondary-fixed-variant": "#3f465c",
+                        "on-primary-container": "#ffffff",
+                        "secondary": "#565e74",
+                        "primary-fixed": "#d8e2ff",
+                        "on-surface-variant": "#414754",
+                        "tertiary-fixed": "#d3e4fe",
+                        "on-tertiary-container": "#000510",
+                        "on-primary": "#ffffff",
+                        "surface-variant": "#e0e2ec",
+                        "on-primary-fixed-variant": "#004493",
+                        "outline-variant": "#c1c6d6",
+                        "surface-tint": "#005bc0",
+                        "tertiary-container": "#68788f",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-bright": "#f9f9ff",
+                        "on-tertiary-fixed": "#0b1c30",
+                        "inverse-surface": "#2d3038",
+                        "error-container": "#ffdad6",
+                        "surface-dim": "#d8d9e3",
+                        "background": "#f9f9ff",
+                        "on-background": "#191c23",
+                        "inverse-primary": "#adc7ff",
+                        "tertiary-fixed-dim": "#b7c8e1",
+                        "surface-container-low": "#f2f3fd",
+                        "secondary-fixed-dim": "#bec6e0",
+                        "on-tertiary": "#ffffff",
+                        "primary": "#005bbf",
+                        "surface": "#f9f9ff",
+                        "on-secondary": "#ffffff",
+                        "on-error": "#ffffff",
+                        "outline": "#727785",
+                        "on-primary-fixed": "#001a41",
+                        "surface-container": "#ecedf7",
+                        "on-surface": "#191c23",
+                        "on-secondary-fixed": "#131b2e",
+                        "on-error-container": "#93000a",
+                        "tertiary": "#4f5f75",
+                        "surface-container-highest": "#e0e2ec",
+                        "surface-container-high": "#e6e8f2",
+                        "primary-fixed-dim": "#adc7ff",
+                        "on-tertiary-fixed-variant": "#38485d",
+                        "on-secondary-container": "#5c647a",
+                        "secondary-fixed": "#dae2fd",
+                        "inverse-on-surface": "#eff0fa"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "sm": "8px",
+                        "margin": "24px",
+                        "xs": "4px",
+                        "lg": "24px",
+                        "md": "16px",
+                        "gutter": "16px",
+                        "xl": "32px",
+                        "unit": "4px"
+                    },
+                    "fontFamily": {
+                        "h3": ["Inter"],
+                        "display": ["Inter"],
+                        "body-md": ["Inter"],
+                        "h1": ["Inter"],
+                        "h2": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-md": ["Inter"],
+                        "label-sm": ["Inter"]
+                    },
+                    "fontSize": {
+                        "h3": ["20px", {"lineHeight": "1.4", "fontWeight": "600"}],
+                        "display": ["36px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-md": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "h1": ["30px", {"lineHeight": "1.3", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "h2": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                        "body-lg": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "label-md": ["12px", {"lineHeight": "1.2", "letterSpacing": "0.01em", "fontWeight": "500"}],
+                        "label-sm": ["11px", {"lineHeight": "1.2", "fontWeight": "600"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9f9ff;
+        }
+    </style>
+</head>
+<body class="antialiased text-on-surface">
+<!-- TopAppBar -->
+<header class="bg-white dark:bg-slate-950 flex items-center justify-between px-6 h-16 w-full z-50 docked full-width top-0 border-b border-slate-200 dark:border-slate-800 shadow-none fixed">
+<div class="flex items-center gap-8">
+<span class="text-lg font-bold tracking-tight text-slate-900 dark:text-white">SecureDrive Enterprise</span>
+<div class="relative w-64">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
+<input class="w-full pl-10 pr-4 py-1.5 bg-surface-container-low border border-outline-variant rounded focus:ring-2 focus:ring-primary/10 focus:border-primary outline-none text-body-md transition-all" placeholder="Search enterprise..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-slate-600 hover:bg-slate-50 rounded transition-colors duration-200 ease-in-out">
+<span class="material-symbols-outlined" data-icon="shield">shield</span>
+</button>
+<button class="p-2 text-slate-600 hover:bg-slate-50 rounded transition-colors duration-200 ease-in-out">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="p-2 text-slate-600 hover:bg-slate-50 rounded transition-colors duration-200 ease-in-out">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+<div class="h-8 w-8 rounded-full overflow-hidden ml-2 border border-outline-variant">
+<img alt="Administrator Profile" data-alt="professional portrait of a high-level IT administrator in a modern office environment with soft bokeh background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAoBvBksi03oKMU3GQoB9Ch6jX2eKDerMV61DQ8IdovdvmxDr-OdRFrfnDqNwdQrPyIThqR4fs7cjvHtGlPUU50e5VU5e3h02zV1j5gvo09KCVy_C3Z2sjzF78C-1RUSdayA7NtWR9SvPg2Kog1QiN6grjzrzG5sooK75LYBPnn1lhHc0pmKpchOQVS9kACqF5SkL1sragfjSr4DEdS6CHRS66vr7lhnTu6MpXyiZfT1oqRzjbvtGwjqIs1hxq8d2L7-wBgYzZWEYJ3"/>
+</div>
+</div>
+</header>
+<div class="flex pt-16">
+<!-- SideNavBar -->
+<aside class="bg-white dark:bg-slate-950 fixed left-0 top-16 h-[calc(100vh-64px)] w-64 border-r border-slate-200 dark:border-slate-800 flex flex-col py-4 gap-y-1 overflow-y-auto">
+<div class="px-6 mb-6">
+<div class="text-blue-600 font-bold uppercase tracking-widest font-label-sm mb-1">File Vault</div>
+<div class="text-slate-400 text-xs font-medium">Institutional Security</div>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-3 px-6 py-2.5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-900/50 duration-150 ease-linear font-sans text-sm font-medium" href="#">
+<span class="material-symbols-outlined" data-icon="folder">folder</span>
+<span>My Files</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-2.5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-900/50 duration-150 ease-linear font-sans text-sm font-medium" href="#">
+<span class="material-symbols-outlined" data-icon="share">share</span>
+<span>Shared Items</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-2.5 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border-r-4 border-blue-600 font-sans text-sm font-medium" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span>User Management</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-2.5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-900/50 duration-150 ease-linear font-sans text-sm font-medium" href="#">
+<span class="material-symbols-outlined" data-icon="admin_panel_settings">admin_panel_settings</span>
+<span>Role Management</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-2.5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-900/50 duration-150 ease-linear font-sans text-sm font-medium" href="#">
+<span class="material-symbols-outlined" data-icon="history">history</span>
+<span>Audit Logs</span>
+</a>
+</nav>
+<div class="px-6 py-4 mt-auto border-t border-slate-100">
+<button class="w-full bg-primary text-white px-4 py-2 rounded-lg font-label-md hover:bg-surface-tint transition-colors mb-4 flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-[18px]">upload_file</span>
+                    Upload File
+                </button>
+<div class="space-y-1">
+<a class="flex items-center gap-3 py-2 text-slate-600 hover:text-slate-900 text-sm font-medium" href="#">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+<span>Support</span>
+</a>
+<a class="flex items-center gap-3 py-2 text-slate-600 hover:text-slate-900 text-sm font-medium" href="#">
+<span class="material-symbols-outlined" data-icon="check_circle">check_circle</span>
+<span>System Status</span>
+</a>
+</div>
+</div>
+</aside>
+
+<!-- Main Content Canvas -->
+<main class="ml-64 w-full p-lg overflow-y-auto">
+<div class="max-w-7xl mx-auto">
+<!-- Header Section -->
+<div class="flex items-center justify-between mb-xl">
+<div>
+<h1 class="font-h1 text-h1 text-on-background mb-xs">User Management</h1>
+<nav class="flex items-center gap-2 text-secondary font-label-md">
+<span>Administration</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span class="text-primary font-semibold">Users</span>
+</nav>
+</div>
+<button class="bg-primary text-white px-6 py-2.5 rounded-xl font-label-md font-semibold hover:bg-surface-tint transition-all shadow-sm flex items-center gap-2">
+<span class="material-symbols-outlined text-[20px]">person_add</span>
+                        Create User
+                    </button>
+</div>
+
+<!-- Users Table Container -->
+<div class="bg-white border border-outline-variant rounded-xl shadow-none overflow-hidden">
+<div class="overflow-x-auto">
+<table class="w-full border-collapse text-left">
+<thead>
+<tr class="bg-surface-container-low border-b border-outline-variant">
+<th class="px-6 py-4 font-label-sm text-secondary uppercase tracking-wider">Name</th>
+<th class="px-6 py-4 font-label-sm text-secondary uppercase tracking-wider">Email</th>
+<th class="px-6 py-4 font-label-sm text-secondary uppercase tracking-wider">Role</th>
+<th class="px-6 py-4 font-label-sm text-secondary uppercase tracking-wider">Status</th>
+<th class="px-6 py-4 font-label-sm text-secondary uppercase tracking-wider text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant">
+<!-- Row 1 -->
+<tr class="hover:bg-slate-50 transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="h-10 w-10 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container font-semibold">JD</div>
+<div>
+<div class="font-body-lg font-semibold text-on-surface">Jane Doe</div>
+<div class="text-label-md text-secondary">Added Mar 12, 2024</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 text-body-md text-on-surface-variant">jane.doe@securedrive.com</td>
+<td class="px-6 py-4">
+<span class="bg-secondary-container text-on-secondary-container px-3 py-1 rounded-full text-label-sm">Security Admin</span>
+</td>
+<td class="px-6 py-4">
+<span class="flex items-center gap-1.5 text-label-sm font-semibold text-primary">
+<span class="h-2 w-2 rounded-full bg-primary"></span>
+                                            Active
+                                        </span>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex items-center justify-end gap-2">
+<button class="p-2 text-secondary hover:text-primary hover:bg-blue-50 rounded-lg transition-colors">
+<span class="material-symbols-outlined" data-icon="edit">edit</span>
+</button>
+<button class="p-2 text-secondary hover:text-error hover:bg-error-container/10 rounded-lg transition-colors">
+<span class="material-symbols-outlined" data-icon="delete">delete</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-slate-50 transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="h-10 w-10 rounded-full bg-slate-200 flex items-center justify-center text-slate-600 font-semibold">MS</div>
+<div>
+<div class="font-body-lg font-semibold text-on-surface">Michael Smith</div>
+<div class="text-label-md text-secondary">Added Feb 28, 2024</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 text-body-md text-on-surface-variant">m.smith@securedrive.com</td>
+<td class="px-6 py-4">
+<span class="bg-surface-container-highest text-on-surface-variant px-3 py-1 rounded-full text-label-sm">Standard User</span>
+</td>
+<td class="px-6 py-4">
+<span class="flex items-center gap-1.5 text-label-sm font-semibold text-primary">
+<span class="h-2 w-2 rounded-full bg-primary"></span>
+                                            Active
+                                        </span>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex items-center justify-end gap-2">
+<button class="p-2 text-secondary hover:text-primary hover:bg-blue-50 rounded-lg transition-colors">
+<span class="material-symbols-outlined" data-icon="edit">edit</span>
+</button>
+<button class="p-2 text-secondary hover:text-error hover:bg-error-container/10 rounded-lg transition-colors">
+<span class="material-symbols-outlined" data-icon="delete">delete</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-slate-50 transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="h-10 w-10 rounded-full bg-tertiary-container flex items-center justify-center text-on-tertiary font-semibold">SC</div>
+<div>
+<div class="font-body-lg font-semibold text-on-surface">Sarah Chen</div>
+<div class="text-label-md text-secondary">Added Jan 15, 2024</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 text-body-md text-on-surface-variant">s.chen@securedrive.com</td>
+<td class="px-6 py-4">
+<span class="bg-tertiary-fixed text-on-tertiary-fixed-variant px-3 py-1 rounded-full text-label-sm">System Analyst</span>
+</td>
+<td class="px-6 py-4">
+<span class="flex items-center gap-1.5 text-label-sm font-semibold text-secondary">
+<span class="h-2 w-2 rounded-full bg-secondary"></span>
+                                            Offline
+                                        </span>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex items-center justify-end gap-2">
+<button class="p-2 text-secondary hover:text-primary hover:bg-blue-50 rounded-lg transition-colors">
+<span class="material-symbols-outlined" data-icon="edit">edit</span>
+</button>
+<button class="p-2 text-secondary hover:text-error hover:bg-error-container/10 rounded-lg transition-colors">
+<span class="material-symbols-outlined" data-icon="delete">delete</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="hover:bg-slate-50 transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="h-10 w-10 rounded-full bg-slate-200 flex items-center justify-center text-slate-600 font-semibold">RJ</div>
+<div>
+<div class="font-body-lg font-semibold text-on-surface">Robert Jackson</div>
+<div class="text-label-md text-secondary">Added Apr 02, 2024</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 text-body-md text-on-surface-variant">r.jackson@securedrive.com</td>
+<td class="px-6 py-4">
+<span class="bg-surface-container-highest text-on-surface-variant px-3 py-1 rounded-full text-label-sm">Standard User</span>
+</td>
+<td class="px-6 py-4">
+<span class="flex items-center gap-1.5 text-label-sm font-semibold text-primary">
+<span class="h-2 w-2 rounded-full bg-primary"></span>
+                                            Active
+                                        </span>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex items-center justify-end gap-2">
+<button class="p-2 text-secondary hover:text-primary hover:bg-blue-50 rounded-lg transition-colors">
+<span class="material-symbols-outlined" data-icon="edit">edit</span>
+</button>
+<button class="p-2 text-secondary hover:text-error hover:bg-error-container/10 rounded-lg transition-colors">
+<span class="material-symbols-outlined" data-icon="delete">delete</span>
+</button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination / Table Footer -->
+<div class="px-6 py-4 bg-surface-container-low border-t border-outline-variant flex items-center justify-between">
+<div class="text-label-md text-secondary">
+                            Showing <span class="font-semibold text-on-surface">1</span> to <span class="font-semibold text-on-surface">4</span> of <span class="font-semibold text-on-surface">124</span> results
+                        </div>
+<div class="flex items-center gap-2">
+<button class="p-1.5 rounded border border-outline-variant hover:bg-white text-secondary transition-colors disabled:opacity-50" disabled="">
+<span class="material-symbols-outlined text-[20px]">chevron_left</span>
+</button>
+<button class="h-8 w-8 rounded flex items-center justify-center bg-primary text-white font-label-sm">1</button>
+<button class="h-8 w-8 rounded flex items-center justify-center hover:bg-white text-secondary font-label-sm border border-transparent hover:border-outline-variant">2</button>
+<button class="h-8 w-8 rounded flex items-center justify-center hover:bg-white text-secondary font-label-sm border border-transparent hover:border-outline-variant">3</button>
+<button class="p-1.5 rounded border border-outline-variant hover:bg-white text-secondary transition-colors">
+<span class="material-symbols-outlined text-[20px]">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Footer Section -->
+<div class="mt-lg flex items-center justify-between text-label-md text-secondary">
+<p>© 2024 SecureDrive Enterprise. All rights reserved.</p>
+<div class="flex gap-4">
+<a class="hover:text-primary transition-colors" href="#">Terms of Service</a>
+<a class="hover:text-primary transition-colors" href="#">Security Policy</a>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>
