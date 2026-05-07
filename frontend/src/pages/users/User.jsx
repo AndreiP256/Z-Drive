@@ -10,7 +10,9 @@ const User = ({ user, onDelete }) => {
             <td className="users-table-cell name-cell">{user.name}</td>
             <td className="users-table-cell email-cell">{user.email}</td>
             <td className="users-table-cell">
-                <span className="role-badge">{user.role}</span>
+                <span className={`role-badge role-badge-${user.role.toLowerCase()}`}>
+                    {user.role}
+                </span>
             </td>
             <td className="users-table-cell">
                 <span className={`users-status-badge users-status-${status.toLowerCase()}`}>

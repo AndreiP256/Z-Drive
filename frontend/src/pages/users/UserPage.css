@@ -137,6 +137,19 @@
   font-weight: 600;
   text-transform: capitalize;
 }
+
+.role-badge-admin {
+  background-color: #cce4ff;
+}
+
+.role-badge-angajat {
+  background-color: #e8e8f0;
+}
+
+.role-badge-manager {
+  background-color: #eec8fa;
+}
+
 /* Pagination footer */
 .users-table-footer {
   display: flex;
