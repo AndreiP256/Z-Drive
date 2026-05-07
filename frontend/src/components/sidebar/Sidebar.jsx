@@ -4,10 +4,10 @@ import { FolderIcon, ShareIcon, UsersIcon, ShieldIcon, ClockIcon } from 'lucide-
 
 const navItems = [
   { name: 'My Files',         icon: <FolderIcon />, path: '/dashboard' },
-  { name: 'Shared Items',     icon: <ShareIcon />,  path: '/dashboard/shared' },
-  { name: 'User Management',  icon: <UsersIcon />,  path: '/dashboard/users' },
-  { name: 'Role Management',  icon: <ShieldIcon />, path: '/dashboard/roles' },
-  { name: 'Audit Logs',       icon: <ClockIcon />,  path: '/dashboard/audit' },
+  { name: 'Shared Items',     icon: <ShareIcon />,  path: '/shared' },
+  { name: 'User Management',  icon: <UsersIcon />,  path: '/users' },
+  { name: 'Role Management',  icon: <ShieldIcon />, path: '/roles' },
+  { name: 'Audit Logs',       icon: <ClockIcon />,  path: '/audit' },
 ];
 
 const Sidebar = () => (
@@ -22,12 +22,6 @@ const Sidebar = () => (
         <SidebarItem key={item.path} {...item} />
       ))}
     </nav>
-
-    {/* <div className="sidebar-footer">
-      <button className="btn-upload">Upload File</button>
-      <SidebarItem name="Support"       icon={<HelpIcon />}   path="/support" />
-      <SidebarItem name="System Status" icon={<StatusIcon />} path="/status" />
-    </div> */}
   </aside>
 );
 

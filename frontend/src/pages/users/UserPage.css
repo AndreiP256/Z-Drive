@@ -1,0 +1,158 @@
+.users-table-container {
+  background-color: #ffffff;
+  border: 1px solid #e0dfdf;
+  border-radius: 12px;
+  box-shadow: none;
+  overflow: hidden;
+}
+
+.users-table-wrapper {
+  overflow-x: auto;
+}
+
+.users-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.users-table-header-row {
+  background-color: rgb(242, 243, 253);
+}
+
+.users-table-header-cell {
+  padding: 16px 24px;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #625b71;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.users-table-actions-cell {
+  text-align: right;
+  align-items: center;
+}
+
+.users-table-body-row {
+  border-bottom: 1px solid #e0dfdf;
+  transition: background-color 0.2s ease;
+}
+
+.users-table-body-row:hover {
+  background-color: #faf8fa;
+}
+
+.users-table-cell {
+  padding: 16px 24px;
+  font-size: 0.875rem;
+  color: #1c1b1f;
+}
+
+.users-status-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.users-status-active {
+  background-color: #e6f4ea;
+  color: #137333;
+}
+
+.users-status-inactive {
+  background-color: #fce8e6;
+  color: #9c211e;
+}
+
+.users-action-button {
+  background-color: transparent;
+  border-radius: 12px;
+  border-width: 0px;
+  color: rgb(86 94 116);
+  padding: 0 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.users-action-button:hover {
+  background-color: rgb(232, 237, 242);
+  color: rgb(0 91 196);
+}
+
+.user-action-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.name-cell {
+  font-weight: 600;
+  color: #000000;
+  font-size: 0.95rem;
+}
+
+.email-cell {
+  color: #6b6b7a;
+  font-size: 0.775rem;
+}
+
+.role-badge {
+  background-color: #e8e8f0;
+  color: #6b6b7a;
+  font-size: 0.775rem;
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+/* Pagination footer */
+.users-table-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+  border-top: 1px solid #e9e8ea;
+  background: linear-gradient(180deg, rgba(250,250,253,0.6), rgba(255,255,255,0.6));
+}
+
+.users-results-summary {
+  color: #6b6b7a;
+  font-size: 0.9rem;
+}
+
+.users-pagination {
+  display: flex;
+  gap: 8px;
+}
+
+.pagination-button {
+  min-width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: 1px solid #e0dfdf;
+  background: #fff;
+  color: #556074;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 8px;
+}
+
+.pagination-button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.pagination-active {
+  background: #0b69ff;
+  color: #fff;
+  border-color: #0b69ff;
+}
