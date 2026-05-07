@@ -24,10 +24,26 @@ const AddUserModal = ({ onClose, onUserAdded }) => {
     <div className="modal-overlay">
       <div className="modal">
         <h2>Add User</h2>
-        <input name="name" placeholder="Name" onChange={handleChange} />
-        <input name="email" placeholder="Email" onChange={handleChange} />
-        <input name="password" placeholder="Password" type="password" onChange={handleChange} />
-        <select name="role" onChange={handleChange}>
+        <input
+          name="name"
+          placeholder="Name"
+          value={form.name}
+          onChange={handleChange}
+        />
+        <input
+          name="email"
+          placeholder="Email"
+          value={form.email}
+          onChange={handleChange}
+        />
+        <input
+          name="password"
+          placeholder="Password"
+          type="password"
+          value={form.password}
+          onChange={handleChange}
+        />
+        <select name="role" value={form.role} onChange={handleChange}>
           <option value="ANGAJAT">Angajat</option>
           <option value="ADMIN">Admin</option>
           <option value="MANAGER">Manager</option>
