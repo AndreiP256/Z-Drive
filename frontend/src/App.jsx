@@ -4,6 +4,7 @@ import { ProtectedRoute } from './router/ProtectedRoute';
 import LoginPage from './pages/login/LoginPage';
 import AdminPage from './pages/AdminPage';
 import NotFound from './pages/not_found/NotFound';
+import Dashboard from './pages/dashboard/Dashboard';
 
 const PrivateRoute = ({ children }) => {
     const { user } = useAuth();
@@ -23,7 +24,7 @@ function App() {
                     {/* Rute Protejate */}
                     <Route path="/dashboard" element={
                         <ProtectedRoute>
-                            <h1>Bine ai venit în Z-Drive!</h1>
+                            <Dashboard/>
                         </ProtectedRoute>
                     } />
 
