@@ -2,11 +2,9 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ProtectedRoute } from './router/ProtectedRoute';
 import LoginPage from './pages/login/LoginPage';
-import AdminPage from './pages/AdminPage';
 import Dashboard from './pages/dashboard/Dashboard';
 import NotFound from './pages/not_found/NotFound';
-import AdminDashboard from './pages/admin-dashboard/AdminDashboard';
-import DashboardLayout from './pages/dashboard/DashboardLayout';
+import DashboardLayout from './components/dashboard-layout/DashboardLayout';
 
 const PrivateRoute = ({ children }) => {
     const { user } = useAuth();
@@ -33,7 +31,7 @@ function App() {
                     {/* Rută protejată suplimentar prin rol */}
                     <Route path="/admin" element={
                         <ProtectedRoute allowedRoles={['ADMIN']}>
-                            <AdminDashboard />
+                            <h1>Ruta de admin daca avem</h1>
                         </ProtectedRoute>
                     } />
                 </Route>

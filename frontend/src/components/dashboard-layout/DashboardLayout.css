@@ -6,6 +6,20 @@
     overflow: hidden; /* Previne scroll-ul pe toată pagina */
 }
 
+
+.stitch {
+    height: 10vh;
+}
+
+.footer-copyright {
+	top : 16rem;
+	text-align: center;
+	padding: 1rem 0;
+	background: #f9fafb;
+	color: #6b7280;
+	font-size: 0.875rem;
+}
+
 /* Header-ul rămâne sus */
 .dashboard-header {
     height: 70px;

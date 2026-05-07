@@ -1,4 +1,5 @@
 import SidebarItem from './SidebarItem';
+import './Sidebar.css'
 import { FolderIcon, ShareIcon, UsersIcon, ShieldIcon, ClockIcon } from 'lucide-react';
 
 const navItems = [
@@ -9,7 +10,7 @@ const navItems = [
   { name: 'Audit Logs',       icon: <ClockIcon />,  path: '/dashboard/audit' },
 ];
 
-const AdminSidebar = () => (
+const Sidebar = () => (
   <aside className="sidebar">
     <div className="sidebar_header">
       <p className="sidebar_brand">FILE VAULT</p>
@@ -30,4 +31,4 @@ const AdminSidebar = () => (
   </aside>
 );
 
-export default AdminSidebar;
+export default Sidebar;

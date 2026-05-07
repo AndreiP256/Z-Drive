@@ -1,5 +1,7 @@
 import { Link, useLocation } from 'react-router-dom';
-import '../AdminDashboard.css';
+
+import './Sidebar.css'
+
 const SidebarItem = ({ name, icon, path }) => {
   const { pathname } = useLocation();
   const isActive = pathname === path;

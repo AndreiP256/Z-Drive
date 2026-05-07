@@ -1,9 +1,9 @@
-import { useAuth } from '../../../context/AuthContext';
-import '../AdminDashboard.css';
-import logo from './../../../assets/logo.png'
-import logout_logo from './../../../assets/logout.png'
+import { useAuth } from '../../context/AuthContext';
+import logo from '../../assets/logo.png'
+import logout_logo from '../../assets/logout.png'
+import './Header.css';
 
-const AdminHeader = () => {
+const Header = () => {
     const { logout } = useAuth();
 
     return (
@@ -29,4 +29,4 @@ const AdminHeader = () => {
     );
 };
 
-export default AdminHeader;
+export default Header;
