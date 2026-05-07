@@ -1,0 +1,107 @@
+.admin-header {
+	position:sticky;
+	top: 0;
+	right: 0;
+	z-index: 40;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	height: 4rem;
+	padding: 0 1.5rem;
+	background: #ffffff;
+	border-bottom: 1px solid #c1c6d6;
+}
+
+.admin-header_brand {
+	display: flex;
+	align-items: center;
+	gap: 1.75rem;
+}
+
+.admin-header_title {
+	margin: 0;
+	font-size: 1.125rem;
+	font-weight: 700;
+	letter-spacing: -0.02em;
+	color: #111827;
+}
+
+.admin-header_search {
+	width: 16rem;
+	padding: 0.375rem 1rem;
+	border: 1px solid #c1c6d6;
+	border-radius: 0.375rem;
+	background: #f2f3fd;
+	color: #111827;
+	outline: none;
+}
+
+.admin-header_search:focus {
+	border-color: #005bbf;
+	box-shadow: 0 0 0 2px rgba(0, 91, 191, 0.12);
+}
+
+.admin-header_actions {
+	display: flex;
+	align-items: center;
+	gap: 1rem;
+}
+
+.admin-header_icon-button {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 2rem;
+	height: 2rem;
+	padding: 0;
+	border: 0;
+	border-radius: 0.375rem;
+	background: transparent;
+	color: #4b5563;
+	cursor: pointer;
+	transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.admin-header_icon-button:hover {
+	background: #f9fafb;
+	color: #111827;
+}
+
+.admin-header_icon {
+    width: 25px;
+    height: 25px;
+}
+
+.footer-copyright {
+	top : 16rem;
+	text-align: center;
+	padding: 1rem 0;
+	background: #f9fafb;
+	color: #6b7280;
+	font-size: 0.875rem;
+}
+
+
+.logo-icon {
+    background: #0061ff;
+    color: white;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    margin: 0 auto 1rem;
+    font-weight: 800;
+    font-size: 1.6rem;
+    box-shadow: 0 4px 12px rgba(0, 97, 255, 0.3);
+}
+
+.logo-container-image {
+    width: 45px;
+    height: 45px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
