@@ -1,0 +1,48 @@
+.file-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 0.5fr;
+    align-items: center;
+    padding: 16px 24px;
+    border-bottom: 1px solid #f1f5f9;
+    transition: background 0.2s;
+}
+
+.file-row:hover {
+    background-color: #f8fafc;
+}
+
+.file-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 500;
+    color: #334155;
+}
+
+.file-icon {
+    color: #64748b;
+    font-size: 1.2rem;
+}
+
+.file-size, .file-type {
+    color: #64748b;
+    font-size: 0.9rem;
+}
+
+.download-icon-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    opacity: 0.5;
+    transition: opacity 0.2s;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.download-icon-btn:hover {
+    opacity: 1;
+}
+
+.download-icon-btn img {
+    width: 20px;
+}

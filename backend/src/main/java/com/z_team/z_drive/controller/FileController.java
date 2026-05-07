@@ -7,6 +7,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -17,6 +18,7 @@ import com.z_team.z_drive.dto.files.MoveRequest;
 import com.z_team.z_drive.dto.files.RenameRequest;
 import com.z_team.z_drive.entity.FileEntity;
 import com.z_team.z_drive.security.SecurityUtils;
+import com.z_team.z_drive.security.UserPrincipal;
 import com.z_team.z_drive.security.annotations.HasDeletePermission;
 import com.z_team.z_drive.security.annotations.HasReadPermission;
 import com.z_team.z_drive.security.annotations.HasWritePermission;
@@ -25,6 +27,9 @@ import com.z_team.z_drive.service.FileService;
 import jakarta.validation.Valid;
 
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 
 
@@ -42,6 +47,18 @@ public class FileController {
     @GetMapping("/test")
     public ResponseEntity<String> test() {
         return ResponseEntity.ok("File controller is working!");
+    }
+
+
+    @GetMapping("/myFiles")
+    public ResponseEntity<List<FileEntity>> getMyFiles(@AuthenticationPrincipal UserPrincipal principal) {
+        System.out.println(principal.id());
+        List<FileEntity> files = fileService.listOwnedFiles(principal.id());
+        System.out.println(files);
+            if (files == null) {
+            return ResponseEntity.ok(Collections.emptyList());
+        }
+        return ResponseEntity.ok(files);
     }
 
     @PostMapping("/upload")
