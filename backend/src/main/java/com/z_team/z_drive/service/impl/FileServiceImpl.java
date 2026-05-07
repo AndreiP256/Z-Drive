@@ -135,6 +135,7 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public List<FileEntity> listAccessibleFiles(UUID userId) {
+        // This needs to be changed
         return fileRepository.findByOwnerId(userId);
     }
 
