@@ -82,21 +82,6 @@
 }
 
 
-.logo-icon {
-    background: #0061ff;
-    color: white;
-    width: 24px;
-    height: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 10px;
-    margin: 0 auto 1rem;
-    font-weight: 800;
-    font-size: 1.6rem;
-    box-shadow: 0 4px 12px rgba(0, 97, 255, 0.3);
-}
-
 .logo-container-image {
     width: 45px;
     height: 45px;
@@ -104,4 +89,10 @@
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+.logo-icon-header {
+	width: 7rem;
+	height: 7rem;
+    object-fit: contain;
 }

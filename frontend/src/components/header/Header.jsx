@@ -10,7 +10,7 @@ const Header = () => {
         <header className="admin-header">
             <div className="admin-header_brand">
                 <div className="logo-container-image">
-                    <img src={logo} alt="Z-Drive Logo" className="brand-logo" />
+                    <img src={logo} alt="Z-Drive Logo" className="logo-icon-header" />
                 </div>
                 <h2 className="admin-header_title">Z-Drive Enterprise</h2>
                 <input
