@@ -25,13 +25,20 @@ const AddUserModal = ({ onClose, onUserAdded }) => {
       role: 'ANGAJAT',
     },
     validationSchema,
-    onSubmit: async (values) => {
+    onSubmit: async (values, { setStatus, setSubmitting }) => {
       try {
         const newUser = await createUser(values);
         onUserAdded(newUser);
         onClose();
       } catch (error) {
-        console.error('Failed to create user:', error);
+        const statusCode = error?.response?.status;
+        if (statusCode === 400) {
+          setStatus('Error duplicate name or username');
+        } else {
+          setStatus('Failed to create user. Please try again.');
+        }
+      } finally {
+        setSubmitting(false);
       }
     },
   });
@@ -44,6 +51,9 @@ const AddUserModal = ({ onClose, onUserAdded }) => {
     <div className="modal-overlay">
       <div className="modal">
         <h2>Add User</h2>
+        {formik.status && (
+          <div className="error-message">{formik.status}</div>
+        )}
         <form onSubmit={formik.handleSubmit}>
           <div className="form-group">
             <input
@@ -96,9 +106,9 @@ const AddUserModal = ({ onClose, onUserAdded }) => {
               onBlur={formik.handleBlur}
               className={getFieldError('role') ? 'input-error' : ''}
             >
-              <option value="ANGAJAT">Angajat</option>
-              <option value="ADMIN">Admin</option>
-              <option value="MANAGER">Manager</option>
+              <option value="ANGAJAT">ANGAJAT</option>
+              <option value="ADMIN">ADMIN</option>
+              <option value="MANAGER">MANAGER</option>
             </select>
             {getFieldError('role') && (
               <span className="error-message">{getFieldError('role')}</span>

@@ -72,9 +72,10 @@
 }
 
 .error-message {
-  font-size: 0.75rem;
+  font-size: 1rem;
   color: #ba1a1a;
   font-weight: 500;
+  padding-left: 0.1rem;
 }
 
 .modal select {
@@ -85,6 +86,7 @@
   background-position: right 8px center;
   background-size: 20px;
   padding-right: 40px;
+  text-transform: uppercase;
 }
 
 .modal-actions {

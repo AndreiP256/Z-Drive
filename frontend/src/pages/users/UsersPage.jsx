@@ -28,6 +28,7 @@ const UsersPage = () => {
     }
 
     const handleUserChanged = (updatedUser) => {
+        if (!updatedUser) return;
         setUsers(prev =>
             prev.map(u => (u.id === updatedUser.id ? updatedUser : u))
         );

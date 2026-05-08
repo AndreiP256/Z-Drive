@@ -32,6 +32,7 @@ export const createUser = async (userData) => {
         return response.data;
     } catch (error) {
         console.error("Error creating user:", error);
+        throw error;
     }
 };
 
@@ -46,6 +47,7 @@ export const updateUser = async (userId, userData) => {
         return response.data;
     } catch (error) {
         console.error("Error updating user:", error);
+        throw error;
     }
 }
 
