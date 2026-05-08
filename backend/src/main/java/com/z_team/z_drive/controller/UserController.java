@@ -65,7 +65,9 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(mapToResponse(createdUser));
     }
 
+
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') or @securityUtils.isCurrentUserId(#id)")
     public ResponseEntity<UserResponse> updateUser(@PathVariable UUID id,
                                                    @RequestBody UpdateUserRequest request) {
         User userToUpdate = mapUpdateRequestToUser(request);

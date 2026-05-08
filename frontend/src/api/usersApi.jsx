@@ -35,6 +35,20 @@ export const createUser = async (userData) => {
     }
 };
 
+export const updateUser = async (userId, userData) => {
+    try {
+        const response = await api.put(`/users/${userId}`, {
+            name: userData.name,
+            email: userData.email,
+            password: userData.password,
+            role: userData.role
+        });
+        return response.data;
+    } catch (error) {
+        console.error("Error updating user:", error);
+    }
+}
+
 // export const uploadFile = async (file, parentDirId = null) => {
 //     const formData = new FormData();
 //     formData.append('file', file);

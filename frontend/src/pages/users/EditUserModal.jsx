@@ -1,7 +1,7 @@
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
-import { createUser } from '../../api/usersApi';
-import './AddUserModal.css';
+import { updateUser } from '../../api/usersApi';
+import './UserModal.css';
 
 const validationSchema = Yup.object().shape({
   name: Yup.string()
@@ -11,27 +11,27 @@ const validationSchema = Yup.object().shape({
     .required('Email is required')
     .email('Invalid email address'),
   password: Yup.string()
-    .required('Password is required')
     .min(6, 'Password must be at least 6 characters'),
   role: Yup.string().required('Role is required'),
 });
 
-const AddUserModal = ({ onClose, onUserAdded }) => {
+const EditUserModal = ({ onClose, onUserChanged, user }) => {
   const formik = useFormik({
     initialValues: {
-      name: '',
-      email: '',
+      name: user?.name || '',
+      email: user?.email || '',
       password: '',
-      role: 'ANGAJAT',
+      role: user?.role || 'ANGAJAT',
     },
     validationSchema,
+
     onSubmit: async (values) => {
       try {
-        const newUser = await createUser(values);
-        onUserAdded(newUser);
+        const newUser = await updateUser(user.id, values);
+        onUserChanged(newUser);
         onClose();
       } catch (error) {
-        console.error('Failed to create user:', error);
+        console.error('Failed to update user:', error);
       }
     },
   });
@@ -43,7 +43,7 @@ const AddUserModal = ({ onClose, onUserAdded }) => {
   return (
     <div className="modal-overlay">
       <div className="modal">
-        <h2>Add User</h2>
+        <h2>Edit User</h2>
         <form onSubmit={formik.handleSubmit}>
           <div className="form-group">
             <input
@@ -110,7 +110,7 @@ const AddUserModal = ({ onClose, onUserAdded }) => {
               Cancel
             </button>
             <button type="submit" disabled={formik.isSubmitting}>
-              {formik.isSubmitting ? 'Creating...' : 'Create'}
+              {formik.isSubmitting ? 'Updating...' : 'Update User'}
             </button>
           </div>
         </form>
@@ -119,4 +119,4 @@ const AddUserModal = ({ onClose, onUserAdded }) => {
   );
 };
 
-export default AddUserModal;
+export default EditUserModal;

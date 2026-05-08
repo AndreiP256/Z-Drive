@@ -1,7 +1,7 @@
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { createUser } from '../../api/usersApi';
-import './AddUserModal.css';
+import './UserModal.css';
 
 const validationSchema = Yup.object().shape({
   name: Yup.string()

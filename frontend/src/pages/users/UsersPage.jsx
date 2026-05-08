@@ -4,6 +4,7 @@ import User from './User.jsx';
 import AddUserModal from './AddUserModal.jsx';
 import { getUsers, deleteUser } from '../../api/usersApi';
 import { useEffect } from 'react';
+import EditUserModal from './EditUserModal.jsx';
 
 const UsersPage = () => {
     const [users, setUsers] = useState([]);
@@ -25,6 +26,12 @@ const UsersPage = () => {
         setUsers(prev => [...prev, newUser]);
     }
 
+    const handleUserChanged = (updatedUser) => {
+        setUsers(prev =>
+            prev.map(u => (u.id === updatedUser.id ? updatedUser : u))
+        );
+    };
+
     const [currentPage, setCurrentPage] = useState(1);
     const perPage = 6;
     const total = users.length;
@@ -42,6 +49,8 @@ const UsersPage = () => {
 
     // Add user form state
     const [showModal, setShowModal] = useState(false);
+    const [showEditModal, setShowEditModal] = useState(false);
+    const [selectedUser, setSelectedUser] = useState(null);
 
 
     return (
@@ -60,6 +69,14 @@ const UsersPage = () => {
                         onUserAdded= {handleUserAdded}
                     />
                 )}
+
+                {showEditModal && (
+                    <EditUserModal
+                        onClose= {() => setShowEditModal(false)}
+                        onUserChanged= {handleUserChanged}
+                        user= {selectedUser}
+                    />
+                )}
             </header>
             <div className="users-table-container">
                 <div className="users-table-wrapper">
@@ -75,7 +92,10 @@ const UsersPage = () => {
                         </thead>
                         <tbody>
                             {users.slice(start - 1, end).map(user => (
-                                <User key={user.id} user={user} onDelete={handleDelete} />
+                                <User key={user.id} user={user} onDelete={handleDelete} onEdit={() => {
+                                    setSelectedUser(user);
+                                    setShowEditModal(true);
+                                }} />
                             ))}
                         </tbody>
                     </table>
