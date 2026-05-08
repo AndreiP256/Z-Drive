@@ -6,6 +6,9 @@ import Dashboard from './pages/dashboard/Dashboard';
 import NotFound from './pages/not_found/NotFound';
 import DashboardLayout from './components/dashboard-layout/DashboardLayout';
 import UsersPage from './pages/users/UsersPage';
+import SharedPage from './pages/shared/SharedPage';
+import RolesPage from './pages/roles/RolesPage';
+import AuditPage from './pages/audit/AuditPage';
 
 const PrivateRoute = ({ children }) => {
     const { user } = useAuth();
@@ -29,6 +32,9 @@ function App() {
                 }>
                     <Route path="/dashboard" element={<Dashboard />} />
                     <Route path="/users" element={<UsersPage />} />
+                    <Route path="/shared" element={<SharedPage />} />
+                    <Route path="/roles" element={<RolesPage />} />
+                    <Route path="/audit" element={<AuditPage />} />
                     
                     {/* Rută protejată suplimentar prin rol */}
                     <Route path="/admin" element={
