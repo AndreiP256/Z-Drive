@@ -18,11 +18,6 @@ const User = ({ user, onDelete, onEdit }) => {
                     {user.role}
                 </span>
             </td>
-            <td className="users-table-cell">
-                <span className={`users-status-badge users-status-${status.toLowerCase()}`}>
-                    {status}
-                </span>
-            </td>
             <td className="users-table-cell users-table-actions-cell">
                 <button className="users-action-button" onClick={() => onEdit()}>
                     <EditIcon className="user-action-icon" />

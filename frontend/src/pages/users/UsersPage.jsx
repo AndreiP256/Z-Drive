@@ -5,6 +5,7 @@ import AddUserModal from './AddUserModal.jsx';
 import { getUsers, deleteUser } from '../../api/usersApi';
 import { useEffect } from 'react';
 import EditUserModal from './EditUserModal.jsx';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 const UsersPage = () => {
     const [users, setUsers] = useState([]);
@@ -86,7 +87,6 @@ const UsersPage = () => {
                                 <th className="users-table-header-cell">Name</th>
                                 <th className="users-table-header-cell">Email</th>
                                 <th className="users-table-header-cell">Role</th>
-                                <th className="users-table-header-cell">Status</th>
                                 <th className="users-table-header-cell users-table-actions-cell">Actions</th>
                             </tr>
                         </thead>
@@ -112,7 +112,7 @@ const UsersPage = () => {
                             onClick={() => goToPage(currentPage - 1)}
                             disabled={currentPage === 1}
                         >
-                            ‹
+                            <ChevronLeft size={16} aria-hidden="true" />
                         </button>
 
                         {pages.map(p => (
@@ -130,7 +130,7 @@ const UsersPage = () => {
                             onClick={() => goToPage(currentPage + 1)}
                             disabled={currentPage === totalPages}
                         >
-                            ›
+                            <ChevronRight size={16} aria-hidden="true" />
                         </button>
                     </div>
                 </div>
