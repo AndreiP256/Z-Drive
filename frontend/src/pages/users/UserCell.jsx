@@ -8,7 +8,7 @@ const possibleStatuses = ['Active', 'Inactive'];
 const status = possibleStatuses[Math.floor(Math.random() * 2)];
 
 
-const User = ({ user, onDelete, onEdit }) => {
+const UserCell = ({ user, onDelete, onEdit }) => {
     return (
         <tr className="users-table-body-row">
             <td className="users-table-cell name-cell">{user.name}</td>
@@ -30,4 +30,4 @@ const User = ({ user, onDelete, onEdit }) => {
     );
 };
 
-export default User;
+export default UserCell;
