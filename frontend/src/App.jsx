@@ -34,9 +34,8 @@ function App() {
                     <Route path="/dashboard" element={<Dashboard />} />
                     <Route path="/shared" element={<SharedPage />} />
                     <Route path="/roles" element={<RolesPage />} />
-                    <Route path="/audit" element={<AuditPage />} />
                     <Route path="/profile" element={<div>Profile Mangement Here</div>} />
-                    
+
                     {/* Rută protejată suplimentar prin rol */}
                     <Route path="/users" element={
                         <ProtectedRoute allowedRoles={['ADMIN']}>
