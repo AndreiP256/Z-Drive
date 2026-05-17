@@ -331,4 +331,38 @@ public class FileServiceImpl implements FileService {
             throw new RuntimeException("File download failed", e);
         }
     }
+
+    @Override
+    public FileEntity uploadProfilePicture(MultipartFile file, UUID userId) {
+        UUID fileId = userId;
+        String storageKey = "profile-pictures/" + fileId.toString();
+
+        if (file.getContentType() == null || !file.getContentType().startsWith("image/")) {
+            throw new RuntimeException("Invalid file type. Only images are allowed for profile pictures.");
+        }
+
+        try {
+            s3Client.putObject(PutObjectRequest.builder()
+                    .bucket(bucketName)
+                    .key(storageKey)
+                    .contentType(file.getContentType())
+                    .build(), 
+                    RequestBody.fromInputStream(file.getInputStream(), file.getSize()));
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to upload profile picture", e);
+        }
+
+        FileEntity profilePicture = new FileEntity();
+        profilePicture.setId(fileId);
+        profilePicture.setName(file.getOriginalFilename());
+        profilePicture.setType(file.getContentType());
+        profilePicture.setSize((float) file.getSize());
+        profilePicture.setFileLocation(storageKey);
+        profilePicture.setOwnerId(userId);
+        profilePicture.setParentId(null);
+        profilePicture.setIsFolder(false);
+
+        return fileRepository.save(profilePicture);
+    }
+
 }

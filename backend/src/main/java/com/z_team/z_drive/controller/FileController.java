@@ -44,12 +44,6 @@ public class FileController {
         this.fileService = fileService;
     }
 
-    @GetMapping("/test")
-    public ResponseEntity<String> test() {
-        return ResponseEntity.ok("File controller is working!");
-    }
-
-
     @GetMapping("/myFiles")
     public ResponseEntity<List<FileEntity>> getMyFiles(@AuthenticationPrincipal UserPrincipal principal) {
         System.out.println(principal.id());
@@ -70,6 +64,22 @@ public class FileController {
                 userId
         );
         return ResponseEntity.ok(mapToResponse(uploadedFile));
+    }
+
+    @PostMapping("/profile-picture")
+    public ResponseEntity<FileResponse> uploadProfilePicture(@Valid @ModelAttribute FileUploadRequest request) {
+        UUID userId = SecurityUtils.getCurrentUserId();
+        FileEntity uploadedFile = fileService.uploadProfilePicture(
+                request.getFile(),
+                userId
+        );
+        return ResponseEntity.ok(mapToResponse(uploadedFile));
+    }
+
+    @GetMapping("/profile-picture")
+    public ResponseEntity<Resource> getProfilePicture(@AuthenticationPrincipal UserPrincipal principal) {
+        UUID userId = principal.id();
+        return downloadFile(userId);
     }
 
     @PostMapping("/create-folder")

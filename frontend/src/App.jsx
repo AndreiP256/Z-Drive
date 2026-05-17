@@ -9,6 +9,7 @@ import UsersPage from './pages/users/UsersPage';
 import SharedPage from './pages/shared/SharedPage';
 import RolesPage from './pages/roles/RolesPage';
 import AuditPage from './pages/audit/AuditPage';
+import ProfilePage from './pages/profile/ProfilePage';
 import Unauthorized from './pages/unauthorized/UnauthorizedPage';
 
 const PrivateRoute = ({ children }) => {
@@ -34,7 +35,8 @@ function App() {
                     <Route path="/dashboard" element={<Dashboard />} />
                     <Route path="/shared" element={<SharedPage />} />
                     <Route path="/roles" element={<RolesPage />} />
-                    <Route path="/profile" element={<div>Profile Mangement Here</div>} />
+                    <Route path="/audit" element={<AuditPage />} />
+                    <Route path="/profile" element={<ProfilePage />} />
 
                     {/* Rută protejată suplimentar prin rol */}
                     <Route path="/users" element={

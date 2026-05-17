@@ -11,7 +11,9 @@ import org.springframework.web.multipart.MultipartFile;
 public interface FileService {
 
         FileEntity uploadFile(MultipartFile file, UUID parentDirId, UUID userId);
-    
+
+        FileEntity uploadProfilePicture(MultipartFile file, UUID userId);
+
         void deleteFile(UUID fileId);
     
         FileEntity getFile(UUID fileId);
@@ -29,5 +31,4 @@ public interface FileService {
         List<FileEntity> listAccessibleFiles(UUID userId);
 
         InputStream downloadFile(UUID fileId);
-
 }

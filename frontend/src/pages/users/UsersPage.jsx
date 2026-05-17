@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import './UserPage.css';
-import User from './User.jsx';
+import User from './UserCell.jsx';
 import AddUserModal from './AddUserModal.jsx';
 import { getUsers, deleteUser } from '../../api/usersApi';
 import { useEffect } from 'react';
 import EditUserModal from './EditUserModal.jsx';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import UserCell from './UserCell.jsx';
 
 const UsersPage = () => {
     const [users, setUsers] = useState([]);
@@ -93,7 +94,7 @@ const UsersPage = () => {
                         </thead>
                         <tbody>
                             {users.slice(start - 1, end).map(user => (
-                                <User key={user.id} user={user} onDelete={handleDelete} onEdit={() => {
+                                <UserCell key={user.id} user={user} onDelete={handleDelete} onEdit={() => {
                                     setSelectedUser(user);
                                     setShowEditModal(true);
                                 }} />
