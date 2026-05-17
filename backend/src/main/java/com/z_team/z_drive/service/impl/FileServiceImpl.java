@@ -190,7 +190,7 @@ public class FileServiceImpl implements FileService {
     @Override
     @Transactional(readOnly = true)
     public List<FileEntity> listAccessibleFiles(UUID userId) {
-        if (isCurrentUserAdminOrManager()) {
+        if (SecurityUtils.isCurrentUserAdmin() || SecurityUtils.isCurrentUserManager()) {
             return fileRepository.findAll();
         }
 
@@ -357,18 +357,5 @@ public class FileServiceImpl implements FileService {
             );
             throw new RuntimeException("File download failed", e);
         }
-    }
-
-    private boolean isCurrentUserAdminOrManager() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if (authentication == null || !authentication.isAuthenticated()) {
-            return false;
-        }
-
-        return authentication.getAuthorities().stream().anyMatch(authority ->
-                authority.getAuthority().equals("ROLE_ADMIN") ||
-                authority.getAuthority().equals("ROLE_MANAGER")
-        );
     }
 }
