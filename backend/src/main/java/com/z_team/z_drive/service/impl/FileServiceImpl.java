@@ -16,6 +16,8 @@ import java.util.List;
 import com.z_team.z_drive.entity.FileEntity;
 import com.z_team.z_drive.repository.FileRepository;
 import com.z_team.z_drive.service.FileService;
+import com.z_team.z_drive.service.LogService;
+import com.z_team.z_drive.security.SecurityUtils;
 
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
@@ -35,19 +37,22 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 public class FileServiceImpl implements FileService {
 
     private final FileRepository fileRepository;
+    private final LogService logService;
     private final String bucketName;
     private final S3Client s3Client;
 
     @Autowired
-    public FileServiceImpl(FileRepository fileRepository, 
+    public FileServiceImpl(FileRepository fileRepository,
+                           LogService logService,
                            @Value("${z-drive.storage.endpoint}") String endpoint,
                            @Value("${z-drive.storage.access-key}") String accessKey,
                            @Value("${z-drive.storage.secret-key}") String secretKey,
                            @Value("${z-drive.storage.bucket-name}") String bucketName) {
 
         this.fileRepository = fileRepository;
+        this.logService = logService;
         this.bucketName = bucketName;
-        
+
         this.s3Client = S3Client.builder()
                 .endpointOverride(URI.create(endpoint))
                 .credentialsProvider(StaticCredentialsProvider.create(
@@ -83,7 +88,7 @@ public class FileServiceImpl implements FileService {
                     .bucket(bucketName)
                     .key(storageKey)
                     .contentType(file.getContentType())
-                    .build(), 
+                    .build(),
                     RequestBody.fromInputStream(file.getInputStream(), file.getSize()));
             FileEntity entity = new FileEntity();
             entity.setId(fileId);
@@ -95,9 +100,26 @@ public class FileServiceImpl implements FileService {
             entity.setParentId(parentDirId);
             entity.setIsFolder(false);
 
-            return fileRepository.save(entity);
+            FileEntity saved = fileRepository.save(entity);
+
+            // Log the upload action
+            logService.logAction(
+                    userId,
+                    "UPLOAD",
+                    fileId,
+                    String.format("Uploaded file: %s (%.2f KB)", file.getOriginalFilename(), file.getSize() / 1024.0)
+            );
+
+            return saved;
 
         } catch (IOException e) {
+            logService.logAction(
+                    userId,
+                    "UPLOAD",
+                    fileId,
+                    String.format("Failed to upload file: %s - Error: %s", file.getOriginalFilename(), e.getMessage()),
+                    "FAILED"
+            );
             throw new RuntimeException("Storage System Unreachable", e);
         }
     }
@@ -110,22 +132,42 @@ public class FileServiceImpl implements FileService {
 
 
     @Override
+    @Transactional
     public void deleteFile(UUID fileId) {
-        boolean isFolder = fileRepository.findById(fileId)
-            .orElseThrow(() -> new RuntimeException("File not found"))
-            .getIsFolder();
+        FileEntity fileEntity = fileRepository.findById(fileId)
+            .orElseThrow(() -> new RuntimeException("File not found"));
+
+        UUID userId = SecurityUtils.getCurrentUserId();
+        String fileName = fileEntity.getName();
+        boolean isFolder = fileEntity.getIsFolder();
+
         fileRepository.deleteById(fileId);
 
-        if (isFolder) return; 
-
-        try {
-            s3Client.deleteObject(request -> 
-            request
-                .bucket(bucketName)
-                .key(fileId.toString()));
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to delete file from storage", e);
+        if (!isFolder) {
+            try {
+                s3Client.deleteObject(request ->
+                request
+                    .bucket(bucketName)
+                    .key(fileId.toString()));
+            } catch (Exception e) {
+                logService.logAction(
+                        userId,
+                        "DELETE",
+                        fileId,
+                        String.format("Failed to delete file from storage: %s - Error: %s", fileName, e.getMessage()),
+                        "FAILED"
+                );
+                throw new RuntimeException("Failed to delete file from storage", e);
+            }
         }
+
+        // Log the delete action
+        logService.logAction(
+                userId,
+                "DELETE",
+                fileId,
+                String.format("Deleted %s: %s", isFolder ? "folder" : "file", fileName)
+        );
     }
 
     @Override
@@ -145,18 +187,39 @@ public class FileServiceImpl implements FileService {
         FileEntity fileEntity = fileRepository.findById(uuid)
             .orElseThrow(() -> new RuntimeException("File not found"));
 
+        UUID userId = SecurityUtils.getCurrentUserId();
+        String oldName = fileEntity.getName();
+
         try {
             s3Client.putObject(PutObjectRequest.builder()
                     .bucket(bucketName)
                     .key(fileEntity.getId().toString())
                     .contentType(file.getContentType())
-                    .build(), 
+                    .build(),
                     RequestBody.fromInputStream(file.getInputStream(), file.getSize()));
             fileEntity.setSize((float) file.getSize());
             fileEntity.setName(file.getOriginalFilename());
             fileEntity.setType(file.getContentType());
-            return fileEntity; 
+
+            FileEntity saved = fileRepository.save(fileEntity);
+
+            // Log the replace action
+            logService.logAction(
+                    userId,
+                    "REPLACE",
+                    uuid,
+                    String.format("Replaced file %s with %s (%.2f KB)", oldName, file.getOriginalFilename(), file.getSize() / 1024.0)
+            );
+
+            return saved;
         } catch (IOException e) {
+            logService.logAction(
+                    userId,
+                    "REPLACE",
+                    uuid,
+                    String.format("Failed to replace file: %s - Error: %s", oldName, e.getMessage()),
+                    "FAILED"
+            );
             throw new RuntimeException("Replacement failed", e);
         }
     }
@@ -166,8 +229,22 @@ public class FileServiceImpl implements FileService {
     public FileEntity rename(UUID uuid, String newName) {
         FileEntity file = fileRepository.findById(uuid)
             .orElseThrow(() -> new RuntimeException("File not found"));
+
+        UUID userId = SecurityUtils.getCurrentUserId();
+        String oldName = file.getName();
+
         file.setName(newName);
-        return file;
+        FileEntity saved = fileRepository.save(file);
+
+        // Log the rename action
+        logService.logAction(
+                userId,
+                "RENAME",
+                uuid,
+                String.format("Renamed file from '%s' to '%s'", oldName, newName)
+        );
+
+        return saved;
     }
 
     @Override
@@ -175,14 +252,30 @@ public class FileServiceImpl implements FileService {
     public FileEntity move(UUID uuid, UUID newParentId) {
         FileEntity file = fileRepository.findById(uuid)
             .orElseThrow(() -> new RuntimeException("File not found"));
+
+        UUID userId = SecurityUtils.getCurrentUserId();
+        UUID oldParentId = file.getParentId();
+
         file.setParentId(newParentId);
-        return file;
+        FileEntity saved = fileRepository.save(file);
+
+        // Log the move action
+        logService.logAction(
+                userId,
+                "MOVE",
+                uuid,
+                String.format("Moved file '%s' from parent %s to parent %s", file.getName(), oldParentId, newParentId)
+        );
+
+        return saved;
     }
 
     @Override
+    @Transactional
     public FileEntity createFolder(UUID parentDirId, UUID userId, String folderName) {
         FileEntity folder = new FileEntity();
-        folder.setId(UUID.randomUUID());
+        UUID folderId = UUID.randomUUID();
+        folder.setId(folderId);
         folder.setName(folderName);
         folder.setSize(0f);
         folder.setType("folder");
@@ -190,7 +283,18 @@ public class FileServiceImpl implements FileService {
         folder.setOwnerId(userId);
         folder.setParentId(parentDirId);
         folder.setIsFolder(true);
-        return fileRepository.save(folder);
+
+        FileEntity saved = fileRepository.save(folder);
+
+        // Log the folder creation action
+        logService.logAction(
+                userId,
+                "CREATE_FOLDER",
+                folderId,
+                String.format("Created folder: %s", folderName)
+        );
+
+        return saved;
     }
 
 
@@ -199,9 +303,32 @@ public class FileServiceImpl implements FileService {
         FileEntity file = fileRepository.findById(fileId)
                 .orElseThrow(() -> new RuntimeException("File not found"));
 
-        return s3Client.getObject(req -> req
-                .bucket(bucketName)
-                .key(file.getFileLocation()), 
-                ResponseTransformer.toInputStream());
+        try {
+            InputStream stream = s3Client.getObject(req -> req
+                    .bucket(bucketName)
+                    .key(file.getFileLocation()),
+                    ResponseTransformer.toInputStream());
+
+            // Log the download action
+            UUID userId = SecurityUtils.getCurrentUserId();
+            logService.logAction(
+                    userId,
+                    "DOWNLOAD",
+                    fileId,
+                    String.format("Downloaded file: %s (%.2f KB)", file.getName(), file.getSize() / 1024.0)
+            );
+
+            return stream;
+        } catch (Exception e) {
+            UUID userId = SecurityUtils.getCurrentUserId();
+            logService.logAction(
+                    userId,
+                    "DOWNLOAD",
+                    fileId,
+                    String.format("Failed to download file: %s - Error: %s", file.getName(), e.getMessage()),
+                    "FAILED"
+            );
+            throw new RuntimeException("File download failed", e);
+        }
     }
 }
