@@ -55,27 +55,41 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    @Transactional
-    public FileRoleResponse updateFileRole(UUID fileRoleId, UpdateFileRoleRequest request) {
-        FileRole role = findRoleOrThrow(fileRoleId);
+	@Transactional
+	public FileRoleResponse updateFileRole(UUID fileRoleId, UpdateFileRoleRequest request) {
+		FileRole role = findRoleOrThrow(fileRoleId);
 
-        if (request.getName() != null) {
-            role.setName(request.getName());
-        }
+		if (request.getName() != null && !request.getName().isBlank()) {
+			role.setName(request.getName());
+		}
 
-        List<RolePermissions> perms;
+		List<RolePermissions> existingPerms = rolePermissionsRepository.findByFileRole_Id(fileRoleId);
 
-        if (request.getPermissions() != null && request.getFileId() != null) {
-            rolePermissionsRepository.deleteByFileRole_Id(fileRoleId);
-            perms = savePermissions(role, request.getFileId(), request.getPermissions());
-        } else {
-            perms = rolePermissionsRepository.findByFileRole_Id(fileRoleId);
-        }
+		UUID targetFileId = request.getFileId();
+		if (targetFileId == null && !existingPerms.isEmpty()) {
+			targetFileId = existingPerms.get(0).getFileId();
+		}
 
-        UUID fileId = perms.isEmpty() ? null : perms.get(0).getFileId();
+		List<RolePermissions> perms;
 
-        return toResponse(role, fileId, perms);
-    }
+		if (request.getPermissions() != null && targetFileId != null) {
+			rolePermissionsRepository.deleteAll(existingPerms);
+			rolePermissionsRepository.flush();
+
+			List<Permission> distinctPermissions = request.getPermissions()
+					.stream()
+					.distinct()
+					.toList();
+
+			perms = savePermissions(role, targetFileId, distinctPermissions);
+		} else {
+			perms = rolePermissionsRepository.findByFileRole_Id(fileRoleId);
+		}
+
+		UUID fileId = perms.isEmpty() ? null : perms.get(0).getFileId();
+
+		return toResponse(role, fileId, perms);
+	}
 
     @Override
     public List<UUID> getRoleFiles(UUID fileRoleId) {
@@ -167,12 +181,13 @@ public class RoleServiceImpl implements RoleService {
     }
 
     private List<RolePermissions> savePermissions(FileRole role, UUID fileId, List<Permission> permissions) {
-        List<RolePermissions> entities = permissions.stream()
-                .map(p -> new RolePermissions(null, role, fileId, p))
-                .toList();
+		List<RolePermissions> entities = permissions.stream()
+				.distinct()
+				.map(p -> new RolePermissions(null, role, fileId, p))
+				.toList();
 
-        return rolePermissionsRepository.saveAll(entities);
-    }
+		return rolePermissionsRepository.saveAll(entities);
+	}
 
     private FileRoleResponse toResponse(FileRole role, UUID fileId, List<RolePermissions> perms) {
         return FileRoleResponse.builder()

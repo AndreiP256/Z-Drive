@@ -1,6 +1,8 @@
 package com.z_team.z_drive.exception;
 
 import jakarta.persistence.EntityNotFoundException;
+
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -42,5 +44,17 @@ public class RbacExceptionHandler {
                 "error", status.getReasonPhrase(),
                 "message", message
         ));
+    }
+
+	@ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<Map<String, Object>> handleDataIntegrityViolation(DataIntegrityViolationException ex) {
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(Map.of(
+                        "timestamp", Instant.now().toString(),
+                        "status", HttpStatus.CONFLICT.value(),
+                        "error", HttpStatus.CONFLICT.getReasonPhrase(),
+                        "message", "Conflict la actualizarea permisiunilor rolului."
+                ));
     }
 }

@@ -61,6 +61,16 @@ public class FileController {
         return ResponseEntity.ok(files);
     }
 
+	@GetMapping("/accessible")
+	public ResponseEntity<List<FileEntity>> getAccessibleFiles(@AuthenticationPrincipal UserPrincipal principal) {
+		List<FileEntity> files = fileService.listAccessibleFiles(principal.id());
+		if (files == null) {
+			return ResponseEntity.ok(Collections.emptyList());
+		}
+		return ResponseEntity.ok(files);
+	}
+
+
     @PostMapping("/upload")
     public ResponseEntity<FileResponse> uploadFile(@Valid @ModelAttribute FileUploadRequest request) {
         UUID userId = SecurityUtils.getCurrentUserId();
@@ -152,4 +162,5 @@ public class FileController {
                 .ownerId(file.getOwnerId())
                 .build();
     }
+
 }

@@ -1,9 +1,15 @@
 package com.z_team.z_drive.service.impl;
 
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -11,10 +17,12 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.util.List;
 
 import com.z_team.z_drive.entity.FileEntity;
 import com.z_team.z_drive.repository.FileRepository;
+import com.z_team.z_drive.repository.RolePermissionsRepository;
+import com.z_team.z_drive.repository.SharedWithUserRepository;
+import com.z_team.z_drive.repository.UsersWithFileRolesRepository;
 import com.z_team.z_drive.service.FileService;
 import com.z_team.z_drive.service.LogService;
 import com.z_team.z_drive.security.SecurityUtils;
@@ -38,12 +46,18 @@ public class FileServiceImpl implements FileService {
 
     private final FileRepository fileRepository;
     private final LogService logService;
+    private final SharedWithUserRepository sharedWithUserRepository;
+    private final UsersWithFileRolesRepository usersWithFileRolesRepository;
+    private final RolePermissionsRepository rolePermissionsRepository;
     private final String bucketName;
     private final S3Client s3Client;
 
     @Autowired
     public FileServiceImpl(FileRepository fileRepository,
                            LogService logService,
+                           SharedWithUserRepository sharedWithUserRepository,
+                           UsersWithFileRolesRepository usersWithFileRolesRepository,
+                           RolePermissionsRepository rolePermissionsRepository,
                            @Value("${z-drive.storage.endpoint}") String endpoint,
                            @Value("${z-drive.storage.access-key}") String accessKey,
                            @Value("${z-drive.storage.secret-key}") String secretKey,
@@ -51,6 +65,9 @@ public class FileServiceImpl implements FileService {
 
         this.fileRepository = fileRepository;
         this.logService = logService;
+        this.sharedWithUserRepository = sharedWithUserRepository;
+        this.usersWithFileRolesRepository = usersWithFileRolesRepository;
+        this.rolePermissionsRepository = rolePermissionsRepository;
         this.bucketName = bucketName;
 
         this.s3Client = S3Client.builder()
@@ -95,14 +112,13 @@ public class FileServiceImpl implements FileService {
             entity.setName(file.getOriginalFilename());
             entity.setSize((float) file.getSize());
             entity.setType(file.getContentType());
-            entity.setFileLocation(storageKey); // Link to the S3 object
+            entity.setFileLocation(storageKey);
             entity.setOwnerId(userId);
             entity.setParentId(parentDirId);
             entity.setIsFolder(false);
 
             FileEntity saved = fileRepository.save(entity);
 
-            // Log the upload action
             logService.logAction(
                     userId,
                     "UPLOAD",
@@ -130,7 +146,6 @@ public class FileServiceImpl implements FileService {
             .orElseThrow(() -> new RuntimeException("File not found"));
     }
 
-
     @Override
     @Transactional
     public void deleteFile(UUID fileId) {
@@ -146,9 +161,7 @@ public class FileServiceImpl implements FileService {
         if (!isFolder) {
             try {
                 s3Client.deleteObject(request ->
-                request
-                    .bucket(bucketName)
-                    .key(fileId.toString()));
+                    request.bucket(bucketName).key(fileId.toString()));
             } catch (Exception e) {
                 logService.logAction(
                         userId,
@@ -161,7 +174,6 @@ public class FileServiceImpl implements FileService {
             }
         }
 
-        // Log the delete action
         logService.logAction(
                 userId,
                 "DELETE",
@@ -176,9 +188,30 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<FileEntity> listAccessibleFiles(UUID userId) {
-        // This needs to be changed
-        return fileRepository.findByOwnerId(userId);
+        if (isCurrentUserAdminOrManager()) {
+            return fileRepository.findAll();
+        }
+
+        Set<UUID> fileIds = new LinkedHashSet<>();
+
+        fileRepository.findByOwnerId(userId)
+                .forEach(file -> fileIds.add(file.getId()));
+
+        sharedWithUserRepository.findByUser_Id(userId)
+                .forEach(sharedWithUser -> fileIds.add(sharedWithUser.getShared().getFileId()));
+
+        usersWithFileRolesRepository.findByUser_Id(userId)
+                .stream()
+                .map(assignment -> assignment.getFileRole().getId())
+                .flatMap(roleId -> rolePermissionsRepository.findByFileRole_Id(roleId).stream())
+                .forEach(rolePermission -> fileIds.add(rolePermission.getFileId()));
+
+        return fileIds.stream()
+                .map(fileRepository::findById)
+                .flatMap(Optional::stream)
+                .toList();
     }
 
     @Override
@@ -203,7 +236,6 @@ public class FileServiceImpl implements FileService {
 
             FileEntity saved = fileRepository.save(fileEntity);
 
-            // Log the replace action
             logService.logAction(
                     userId,
                     "REPLACE",
@@ -236,7 +268,6 @@ public class FileServiceImpl implements FileService {
         file.setName(newName);
         FileEntity saved = fileRepository.save(file);
 
-        // Log the rename action
         logService.logAction(
                 userId,
                 "RENAME",
@@ -259,7 +290,6 @@ public class FileServiceImpl implements FileService {
         file.setParentId(newParentId);
         FileEntity saved = fileRepository.save(file);
 
-        // Log the move action
         logService.logAction(
                 userId,
                 "MOVE",
@@ -286,7 +316,6 @@ public class FileServiceImpl implements FileService {
 
         FileEntity saved = fileRepository.save(folder);
 
-        // Log the folder creation action
         logService.logAction(
                 userId,
                 "CREATE_FOLDER",
@@ -296,7 +325,6 @@ public class FileServiceImpl implements FileService {
 
         return saved;
     }
-
 
     @Override
     public InputStream downloadFile(UUID fileId) {
@@ -309,7 +337,6 @@ public class FileServiceImpl implements FileService {
                     .key(file.getFileLocation()),
                     ResponseTransformer.toInputStream());
 
-            // Log the download action
             UUID userId = SecurityUtils.getCurrentUserId();
             logService.logAction(
                     userId,
@@ -330,5 +357,18 @@ public class FileServiceImpl implements FileService {
             );
             throw new RuntimeException("File download failed", e);
         }
+    }
+
+    private boolean isCurrentUserAdminOrManager() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return false;
+        }
+
+        return authentication.getAuthorities().stream().anyMatch(authority ->
+                authority.getAuthority().equals("ROLE_ADMIN") ||
+                authority.getAuthority().equals("ROLE_MANAGER")
+        );
     }
 }
