@@ -4,6 +4,8 @@ import logo from '../../assets/logo.png'
 import logout_logo from '../../assets/logout.png'
 import './Header.css';
 import {getProfilePictureUrl} from '../../api/filesApi.jsx';
+import defaultAvatar from '../../assets/defaultAvatar.png';
+
 
 const Header = () => {
     const { logout } = useAuth();
@@ -11,8 +13,13 @@ const Header = () => {
 
     useEffect(() => {
         const fetchProfileUrl = async () => {
-            const url = await getProfilePictureUrl();
-            setProfileUrl(url);
+            try {
+                const url = await getProfilePictureUrl();
+                setProfileUrl(url);
+            } catch (error){
+                console.error("Failed to fetch profile picture, falling back to default.", error);
+                setProfileUrl(defaultAvatar);
+            }
         };
         fetchProfileUrl();
     }, []);

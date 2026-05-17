@@ -88,8 +88,13 @@ public class FileController {
 
     @GetMapping("/profile-picture")
     public ResponseEntity<Resource> getProfilePicture(@AuthenticationPrincipal UserPrincipal principal) {
-        UUID userId = principal.id();
-        return downloadFile(userId);
+        try {
+            UUID userId = principal.id();
+            return downloadFile(userId);
+        } catch (Exception e) { 
+            // Catch whatever your fileService throws when a file is missing (e.g., FileNotFoundException)
+            return ResponseEntity.notFound().build(); 
+        }
     }
 
     @PostMapping("/create-folder")
