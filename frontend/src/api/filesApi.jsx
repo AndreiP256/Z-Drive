@@ -5,10 +5,22 @@ export const getMyFiles = async () => {
         const response = await api.get('/files/myFiles');
         const files = response.data;
 
-        console.log(files)
+        console.log(files);
         return files;
     } catch (error) {
         console.error("Error loading files:", error);
+    }
+};
+
+export const getAccessibleFiles = async () => {
+    try {
+        const response = await api.get('/files/accessible');
+        const files = response.data;
+
+        console.log(files);
+        return files;
+    } catch (error) {
+        console.error("Error loading accessible files:", error);
     }
 };
 
