@@ -40,3 +40,25 @@ export const downloadFile = async (fileId, fileName) => {
     link.click();
     link.remove();
 };
+
+export const uploadProfilePicture = async (file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const response = await api.post('/files/profile-picture', formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
+    });
+    return response.data;
+};
+
+export const getProfilePictureUrl = async () => {
+    const response = await api.get('/files/profile-picture', {
+        responseType: 'blob',
+    });
+
+    const contentType = response.headers?.['content-type'] || 'image/*';
+    const blob = new Blob([response.data], { type: contentType });
+    return window.URL.createObjectURL(blob);
+};
