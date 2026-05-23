@@ -1,27 +1,13 @@
 import api from './axios';
 
 export const getMyFiles = async () => {
-    try {
-        const response = await api.get('/files/myFiles');
-        const files = response.data;
-
-        console.log(files);
-        return files;
-    } catch (error) {
-        console.error("Error loading files:", error);
-    }
+    const response = await api.get('/files/myFiles');
+    return response.data;
 };
 
 export const getAccessibleFiles = async () => {
-    try {
-        const response = await api.get('/files/accessible');
-        const files = response.data;
-
-        console.log(files);
-        return files;
-    } catch (error) {
-        console.error("Error loading accessible files:", error);
-    }
+    const response = await api.get('/files/accessible');
+    return response.data;
 };
 
 export const uploadFile = async (file, parentDirId = null) => {
@@ -51,6 +37,12 @@ export const downloadFile = async (fileId, fileName) => {
     document.body.appendChild(link);
     link.click();
     link.remove();
+    window.URL.revokeObjectURL(url);
+};
+
+export const deleteFile = async (fileId) => {
+    const response = await api.delete(`/files/delete/${fileId}`);
+    return response.data;
 };
 
 export const uploadProfilePicture = async (file) => {

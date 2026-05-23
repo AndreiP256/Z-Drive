@@ -1,14 +1,23 @@
 .file-row {
     display: grid;
-    grid-template-columns: 2fr 1fr 1fr 0.5fr;
+    grid-template-columns: 1fr 120px 180px 112px;
+    gap: 20px;
     align-items: center;
     padding: 16px 24px;
     border-bottom: 1px solid #f1f5f9;
     transition: background 0.2s;
 }
 
+.file-row--with-owner {
+    grid-template-columns: minmax(220px, 1.4fr) minmax(180px, 0.9fr) 120px 160px 112px;
+}
+
 .file-row:hover {
     background-color: #f8fafc;
+}
+
+.file-row:last-child {
+    border-bottom: 0;
 }
 
 .file-info {
@@ -17,32 +26,82 @@
     gap: 12px;
     font-weight: 500;
     color: #334155;
+    min-width: 0;
 }
 
-.file-icon {
-    color: #64748b;
-    font-size: 1.2rem;
+.file-icon-wrapper {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: #eff6ff;
+    color: #2563eb;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
 }
 
-.file-size, .file-type {
+.file-name-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.file-size,
+.file-type,
+.file-owner {
     color: #64748b;
     font-size: 0.9rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
-.download-icon-btn {
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    opacity: 0.5;
-    transition: opacity 0.2s;
+.file-actions {
     display: flex;
     justify-content: flex-end;
+    gap: 6px;
 }
 
-.download-icon-btn:hover {
-    opacity: 1;
+.file-action-btn {
+    width: 34px;
+    height: 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #ffffff;
+    color: #475569;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
 
-.download-icon-btn img {
-    width: 20px;
+.file-action-btn:hover:not(:disabled) {
+    background: #eff6ff;
+    color: #0b69ff;
+    border-color: #bfdbfe;
+}
+
+.file-action-btn-danger:hover:not(:disabled) {
+    background: #fdecec;
+    color: #b42318;
+    border-color: #f7d0d0;
+}
+
+.file-action-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.55;
+}
+
+@media (max-width: 900px) {
+    .file-row,
+    .file-row--with-owner {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .file-actions {
+        justify-content: flex-start;
+    }
 }

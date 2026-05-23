@@ -26,6 +26,142 @@
     font-size: 1rem;
     border: none;
     cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.upload-btn:hover:not(:disabled) {
+    background-color: #0052d6;
+}
+
+.upload-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.files-page-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 18px;
+}
+
+.files-search-box {
+    flex: 1;
+    min-width: 240px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #ffffff;
+    border: 1px solid #d9d9df;
+    border-radius: 10px;
+    padding: 0 12px;
+    color: #64748b;
+}
+
+.files-search-box:focus-within {
+    border-color: #0b69ff;
+    box-shadow: 0 0 0 3px rgba(11, 105, 255, 0.12);
+}
+
+.files-search-box input {
+    width: 100%;
+    border: 0;
+    outline: none;
+    padding: 11px 0;
+    color: #111827;
+    font-size: 0.95rem;
+    background: transparent;
+}
+
+.files-toolbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.primary-file-btn,
+.secondary-file-btn,
+.danger-file-btn {
+    border: none;
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 0.92rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.primary-file-btn {
+    background: #0b69ff;
+    color: #ffffff;
+}
+
+.primary-file-btn:hover:not(:disabled) {
+    background: #0058d8;
+}
+
+.secondary-file-btn {
+    background: #eef2ff;
+    color: #3451a3;
+}
+
+.secondary-file-btn:hover:not(:disabled) {
+    background: #e1e8ff;
+}
+
+.danger-file-btn {
+    background: #fdecec;
+    color: #b42318;
+}
+
+.danger-file-btn:hover:not(:disabled) {
+    background: #fad8d8;
+}
+
+.primary-file-btn:disabled,
+.secondary-file-btn:disabled,
+.danger-file-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.file-feedback {
+    padding: 12px 14px;
+    border-radius: 10px;
+    margin-bottom: 16px;
+    font-weight: 500;
+    font-size: 0.92rem;
+}
+
+.file-feedback-success {
+    background: #e8f7ee;
+    color: #1e7a45;
+    border: 1px solid #cdeed9;
+}
+
+.file-feedback-error {
+    background: #fdecec;
+    color: #b42318;
+    border: 1px solid #f7d0d0;
+}
+
+.page-info-banner {
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    color: #1d4ed8;
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin-bottom: 16px;
+    font-size: 0.92rem;
+    font-weight: 500;
 }
 
 .file-card {
@@ -33,13 +169,14 @@
     border: 1px solid #eaecf0;
     border-radius: 12px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    overflow: hidden;
 }
 
 /* ALINIERE PERFECTĂ COLOANE */
 .file-header-row {
     display: grid;
     /* Numele ia tot spațiul, restul coloanelor sunt fixe */
-    grid-template-columns: 1fr 120px 180px 80px; 
+    grid-template-columns: 1fr 120px 180px 112px;
     gap: 20px;
     padding: 12px 24px;
     background: #f9fafb;
@@ -47,6 +184,10 @@
     font-size: 12px;
     font-weight: 600;
     color: #667085;
+}
+
+.file-header-row--with-owner {
+    grid-template-columns: minmax(220px, 1.4fr) minmax(180px, 0.9fr) 120px 160px 112px;
 }
 
 .text-right { text-align: right; }
@@ -78,4 +219,33 @@
 .empty-state-container span {
     font-size: 14px;
     margin-top: 4px;
+}
+
+.file-loading-icon {
+    color: #0b69ff;
+    margin-bottom: 12px;
+    animation: file-spin 0.9s linear infinite;
+}
+
+@keyframes file-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@media (max-width: 900px) {
+    .files-page-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .files-toolbar-actions {
+        justify-content: flex-start;
+        flex-wrap: wrap;
+    }
+
+    .file-header-row,
+    .file-header-row--with-owner {
+        display: none;
+    }
 }

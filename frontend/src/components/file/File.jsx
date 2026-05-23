@@ -1,46 +1,68 @@
-import React from 'react';
-import { downloadFile } from '../../api/filesApi';
+import { Download, FileText, Folder, Share2, Trash2 } from 'lucide-react';
 import './File.css';
 
-const File = ({ file }) => {
-    const handleDownload = async (e) => {
-        e.preventDefault();
-        try {
-            // Trimitem ID-ul și numele pentru a salva fișierul corect
-            await downloadFile(file.id, file.name);
-        } catch (error) {
-            console.error("Download failed", error);
-            alert("Could not download file.");
-        }
-    };
+const formatFileSize = (size) => {
+    if (!size || Number(size) === 0) return '0 B';
+    if (size >= 1024 * 1024 * 1024) return `${(size / (1024 * 1024 * 1024)).toFixed(2)} GB`;
+    if (size >= 1024 * 1024) return `${(size / (1024 * 1024)).toFixed(2)} MB`;
+    if (size >= 1024) return `${(size / 1024).toFixed(2)} KB`;
+    return `${Math.round(size)} B`;
+};
 
-    const formatFileSize = (sizeInKb) => {
-        if (!sizeInKb || sizeInKb === 0) return '0 b';
-        if (sizeInKb >= 1024 * 1024 * 1024) {
-            return (sizeInKb / (1024 * 1024 * 1024)).toFixed(2) + ' GB';
-        } else if (sizeInKb >= 1024 * 1024) {
-            return (sizeInKb / (1024 * 1024)).toFixed(2) + ' MB';
-        }else if(sizeInKb >= 1024){
-            return (sizeInKb / 1024 ).toFixed(2) + ' KB';
-        } else {
-            return Math.round(sizeInKb) + ' b';
-        }
-    };
+const File = ({
+    file,
+    showOwner = false,
+    ownerLabel = '-',
+    onDownload,
+    onShare,
+    onDelete,
+    busy = false,
+}) => {
+    const isFolder = Boolean(file.isFolder);
 
     return (
-        <div className="file-row">
+        <div className={`file-row ${showOwner ? 'file-row--with-owner' : ''}`}>
             <div className="file-info">
                 <span className="file-icon-wrapper">
-                    {file.isFolder ? '📁' : '📄'}
+                    {isFolder ? <Folder size={20} /> : <FileText size={20} />}
                 </span>
                 <span className="file-name-text">{file.name}</span>
             </div>
-            <div className="file-size">{file.isFolder ? '--' : formatFileSize(file.size)}</div>
+            {showOwner && <div className="file-owner">{ownerLabel}</div>}
+            <div className="file-size">{isFolder ? '--' : formatFileSize(file.size)}</div>
             <div className="file-type">{file.type || 'Unknown'}</div>
             <div className="file-actions">
-                {!file.isFolder && (
-                    <button className="action-btn download" onClick={handleDownload} title="Download">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                {!isFolder && onDownload && (
+                    <button
+                        className="file-action-btn"
+                        onClick={() => onDownload(file)}
+                        title="Download"
+                        type="button"
+                        disabled={busy}
+                    >
+                        <Download size={18} />
+                    </button>
+                )}
+                {onShare && (
+                    <button
+                        className="file-action-btn"
+                        onClick={() => onShare(file)}
+                        title="Share"
+                        type="button"
+                        disabled={busy}
+                    >
+                        <Share2 size={18} />
+                    </button>
+                )}
+                {onDelete && (
+                    <button
+                        className="file-action-btn file-action-btn-danger"
+                        onClick={() => onDelete(file)}
+                        title="Delete"
+                        type="button"
+                        disabled={busy}
+                    >
+                        <Trash2 size={18} />
                     </button>
                 )}
             </div>
