@@ -4,6 +4,7 @@ import com.z_team.z_drive.dto.user.CreateUserRequest;
 import com.z_team.z_drive.dto.user.UpdateUserRequest;
 import com.z_team.z_drive.dto.user.UserResponse;
 import com.z_team.z_drive.entity.User;
+import com.z_team.z_drive.security.SecurityUtils;
 import com.z_team.z_drive.security.UserPrincipal;
 import com.z_team.z_drive.service.UserService;
 import org.springframework.http.HttpStatus;
@@ -82,6 +83,13 @@ public class UserController {
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
     }
+
+    @PatchMapping("/password")
+    public ResponseEntity<Void> changePassword(@RequestBody String newPassword) {
+        UUID currentUserId = SecurityUtils.getCurrentUserId();
+        userService.changePassword(currentUserId, newPassword);
+        return ResponseEntity.ok().build();
+    }   
 
     private User mapCreateRequestToUser(CreateUserRequest request) {
         User user = new User();

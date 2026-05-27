@@ -1,6 +1,5 @@
 package com.z_team.z_drive.config;
 
-import java.beans.Customizer;
 import java.util.List;
 
 import org.springframework.context.annotation.Bean;
@@ -12,13 +11,10 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.cors.CorsConfiguration;
 
 import com.z_team.z_drive.exception.AuthenticationExceptionHandler;
 import com.z_team.z_drive.security.JwtAuthenticationFilter;
@@ -66,7 +62,7 @@ public class SecurityConfig {
         
         configuration.setAllowedOrigins(List.of("http://localhost:5173")); 
         
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "Cache-Control"));
         

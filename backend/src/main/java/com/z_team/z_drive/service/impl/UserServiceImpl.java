@@ -193,4 +193,21 @@ public class UserServiceImpl implements UserService {
     private boolean isBlank(String value) {
         return value == null || value.trim().isEmpty();
     }
+
+    @Override
+    @Transactional
+    public void changePassword(UUID currentUserId, String newPassword) {
+        if (currentUserId == null) {
+            throw new IllegalArgumentException("Current user ID cannot be null.");
+        }
+
+        if (isBlank(newPassword)) {
+            throw new IllegalArgumentException("New password cannot be empty.");
+        }
+
+        User user = userRepository.findById(currentUserId)
+                .orElseThrow(() -> new NoSuchElementException("User not found with ID: " + currentUserId));
+        user.setPassword(passwordManager.hashPassword(newPassword));
+        userRepository.save(user);
+    }
 }

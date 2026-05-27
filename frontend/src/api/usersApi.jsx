@@ -51,31 +51,15 @@ export const updateUser = async (userId, userData) => {
     }
 }
 
-// export const uploadFile = async (file, parentDirId = null) => {
-//     const formData = new FormData();
-//     formData.append('file', file);
-//     if (parentDirId) {
-//         formData.append('parentDirId', parentDirId);
-//     }
-
-//     const response = await api.post('/files/upload', formData, {
-//         headers: {
-//             'Content-Type': 'multipart/form-data',
-//         },
-//     });
-//     return response.data;
-// };
-
-// export const downloadFile = async (fileId, fileName) => {
-//     const response = await api.get(`/files/download/${fileId}`, {
-//         responseType: 'blob',
-//     });
-
-//     const url = window.URL.createObjectURL(new Blob([response.data]));
-//     const link = document.createElement('a');
-//     link.href = url;
-//     link.setAttribute('download', fileName);
-//     document.body.appendChild(link);
-//     link.click();
-//     link.remove();
-// };
+export const changePassword = async (newPassword) => {
+    try {
+        await api.patch('/users/password', newPassword, {
+            headers: {
+                'Content-Type': 'text/plain',
+            },
+        });
+    } catch (error) {
+        console.error("Error changing password:", error);
+        throw error;
+    }
+};
