@@ -1,6 +1,5 @@
 package com.z_team.z_drive.entity;
 
-import com.z_team.z_drive.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 

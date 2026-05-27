@@ -6,7 +6,6 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,7 +26,6 @@ import com.z_team.z_drive.service.FileService;
 import jakarta.validation.Valid;
 
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -90,9 +88,12 @@ public class FileController {
     public ResponseEntity<Resource> getProfilePicture(@AuthenticationPrincipal UserPrincipal principal) {
         try {
             UUID userId = principal.id();
-            return downloadFile(userId);
+            InputStreamResource resource = new InputStreamResource(fileService.downloadFile(userId));
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"profile_picture\"")
+                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                    .body(resource);
         } catch (Exception e) { 
-            // Catch whatever your fileService throws when a file is missing (e.g., FileNotFoundException)
             return ResponseEntity.notFound().build(); 
         }
     }

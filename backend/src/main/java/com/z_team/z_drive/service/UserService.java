@@ -16,4 +16,6 @@ public interface UserService {
     User getUserProfile(UUID userId);
 
     List<User> getAllUsers();
+
+    void changePassword(UUID currentUserId, String newPassword);
 }

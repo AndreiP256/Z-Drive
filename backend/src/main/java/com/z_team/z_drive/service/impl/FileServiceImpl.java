@@ -8,8 +8,6 @@ import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -43,6 +41,8 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 @Service
 public class FileServiceImpl implements FileService {
+
+    private static final String PROFILE_PICTURE_PREFIX = "profile-pictures/";
 
     private final FileRepository fileRepository;
     private final LogService logService;
@@ -142,8 +142,14 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public FileEntity getFile(UUID fileId) {
-        return fileRepository.findById(fileId)
+        FileEntity file = fileRepository.findById(fileId)
             .orElseThrow(() -> new RuntimeException("File not found"));
+
+        if (isProfilePicture(file)) {
+            throw new RuntimeException("File not found");
+        }
+
+        return file;
     }
 
     @Override
@@ -184,20 +190,23 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public List<FileEntity> listOwnedFiles(UUID userId) {
-        return fileRepository.findByOwnerId(userId);
+        return fileRepository.findByOwnerId(userId)
+                .stream()
+                .filter(file -> !isProfilePicture(file))
+                .toList();
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<FileEntity> listAccessibleFiles(UUID userId) {
         if (SecurityUtils.isCurrentUserAdmin() || SecurityUtils.isCurrentUserManager()) {
-            return fileRepository.findAll();
+            return fileRepository.findAll()
+                    .stream()
+                    .filter(file -> !isProfilePicture(file))
+                    .toList();
         }
 
         Set<UUID> fileIds = new LinkedHashSet<>();
-
-        fileRepository.findByOwnerId(userId)
-                .forEach(file -> fileIds.add(file.getId()));
 
         sharedWithUserRepository.findByUser_Id(userId)
                 .forEach(sharedWithUser -> fileIds.add(sharedWithUser.getShared().getFileId()));
@@ -211,6 +220,7 @@ public class FileServiceImpl implements FileService {
         return fileIds.stream()
                 .map(fileRepository::findById)
                 .flatMap(Optional::stream)
+            .filter(file -> !isProfilePicture(file))
                 .toList();
     }
 
@@ -362,7 +372,7 @@ public class FileServiceImpl implements FileService {
     @Override
     public FileEntity uploadProfilePicture(MultipartFile file, UUID userId) {
         UUID fileId = userId;
-        String storageKey = "profile-pictures/" + fileId.toString();
+        String storageKey = PROFILE_PICTURE_PREFIX + fileId.toString();
 
         if (file.getContentType() == null || !file.getContentType().startsWith("image/")) {
             throw new RuntimeException("Invalid file type. Only images are allowed for profile pictures.");
@@ -375,21 +385,41 @@ public class FileServiceImpl implements FileService {
                     .contentType(file.getContentType())
                     .build(), 
                     RequestBody.fromInputStream(file.getInputStream(), file.getSize()));
+
+            FileEntity profilePicture = new FileEntity();
+            profilePicture.setId(fileId);
+            profilePicture.setName(file.getOriginalFilename());
+            profilePicture.setType(file.getContentType());
+            profilePicture.setSize((float) file.getSize());
+            profilePicture.setFileLocation(storageKey);
+            profilePicture.setOwnerId(userId);
+            profilePicture.setParentId(null);
+            profilePicture.setIsFolder(false);
+
+            FileEntity saved = fileRepository.save(profilePicture);
+
+            logService.logAction(
+                    userId,
+                    "UPLOAD_PROFILE_PICTURE",
+                    fileId,
+                    String.format("Uploaded profile picture: %s (%.2f KB)", file.getOriginalFilename(), file.getSize() / 1024.0)
+            );
+
+            return saved;
         } catch (IOException e) {
+            logService.logAction(
+                    userId,
+                    "UPLOAD_PROFILE_PICTURE",
+                    fileId,
+                    String.format("Failed to upload profile picture: %s - Error: %s", file.getOriginalFilename(), e.getMessage()),
+                    "FAILED"
+            );
             throw new RuntimeException("Failed to upload profile picture", e);
         }
+    }
 
-        FileEntity profilePicture = new FileEntity();
-        profilePicture.setId(fileId);
-        profilePicture.setName(file.getOriginalFilename());
-        profilePicture.setType(file.getContentType());
-        profilePicture.setSize((float) file.getSize());
-        profilePicture.setFileLocation(storageKey);
-        profilePicture.setOwnerId(userId);
-        profilePicture.setParentId(null);
-        profilePicture.setIsFolder(false);
-
-        return fileRepository.save(profilePicture);
+    private boolean isProfilePicture(FileEntity file) {
+        return file.getFileLocation() != null && file.getFileLocation().startsWith(PROFILE_PICTURE_PREFIX);
     }
 
 }
