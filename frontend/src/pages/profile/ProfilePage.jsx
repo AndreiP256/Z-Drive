@@ -9,6 +9,12 @@ const ProfilePage = () => {
     const [uploading, setUploading] = useState(false);
     const [profilePictureUrl, setProfilePictureUrl] = useState('');
     const [pictureError, setPictureError] = useState(false);
+    const [passwordFormOpen, setPasswordFormOpen] = useState(false);
+    const [newPassword, setNewPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [passwordError, setPasswordError] = useState('');
+    const [passwordSuccess, setPasswordSuccess] = useState('');
+    const [changingPassword, setChangingPassword] = useState(false);
     const fileInputRef = useRef(null);
 
     const displayName = useMemo(() => {
@@ -59,14 +65,7 @@ const ProfilePage = () => {
         setUploading(true);
         try {
             await uploadProfilePicture(file);
-
-            if (profilePictureUrl) {
-                window.URL.revokeObjectURL(profilePictureUrl);
-            }
-
-            const nextPictureUrl = await getProfilePictureUrl();
-            setProfilePictureUrl(nextPictureUrl);
-            setPictureError(false);
+            window.location.reload();
         } catch (error) {
             console.error('Error uploading profile picture:', error);
             alert('Failed to upload profile picture.');
@@ -76,18 +75,50 @@ const ProfilePage = () => {
         }
     };
 
-    const handleChangePassword = async () => {
-        const newPassword = prompt('Enter your new password:');
-        if (!newPassword) {
+    const openPasswordForm = () => {
+        setPasswordFormOpen(true);
+        setPasswordError('');
+        setPasswordSuccess('');
+    };
+
+    const closePasswordForm = () => {
+        setPasswordFormOpen(false);
+        setNewPassword('');
+        setConfirmPassword('');
+        setPasswordError('');
+        setPasswordSuccess('');
+    };
+
+    const handleChangePassword = async (event) => {
+        event.preventDefault();
+
+        const trimmedPassword = newPassword.trim();
+        const trimmedConfirmation = confirmPassword.trim();
+
+        if (trimmedPassword.length < 6) {
+            setPasswordError('Password must be at least 6 characters long.');
             return;
         }
 
+        if (trimmedPassword !== trimmedConfirmation) {
+            setPasswordError('Passwords do not match.');
+            return;
+        }
+
+        setChangingPassword(true);
+        setPasswordError('');
+        setPasswordSuccess('');
+
         try {
-            await changePassword(newPassword);
-            alert('Password changed successfully.');
+            await changePassword(trimmedPassword);
+            setPasswordSuccess('Password changed successfully.');
+            setNewPassword('');
+            setConfirmPassword('');
         } catch (error) {
             console.error('Error changing password:', error);
-            alert('Failed to change password.');
+            setPasswordError('Failed to change password. Please try again.');
+        } finally {
+            setChangingPassword(false);
         }
     };
 
@@ -121,9 +152,55 @@ const ProfilePage = () => {
                 <h1 className="profile-name">{displayName}</h1>
                 <p className="profile-email">{displayEmail}</p>
 
-                <button className="profile-change-password-btn" type="button" onClick={handleChangePassword}>
-                    Change Password
-                </button>
+                {!passwordFormOpen ? (
+                    <button className="profile-change-password-btn" type="button" onClick={openPasswordForm}>
+                        Change Password
+                    </button>
+                ) : (
+                    <form className="profile-password-panel" onSubmit={handleChangePassword}>
+                        <div className="profile-form-group">
+                            <label className="profile-form-label" htmlFor="newPassword">
+                                New Password
+                            </label>
+                            <input
+                                id="newPassword"
+                                className="profile-form-input"
+                                type="password"
+                                value={newPassword}
+                                onChange={(event) => setNewPassword(event.target.value)}
+                                placeholder="Enter new password"
+                                autoComplete="new-password"
+                            />
+                        </div>
+
+                        <div className="profile-form-group">
+                            <label className="profile-form-label" htmlFor="confirmPassword">
+                                Confirm Password
+                            </label>
+                            <input
+                                id="confirmPassword"
+                                className="profile-form-input"
+                                type="password"
+                                value={confirmPassword}
+                                onChange={(event) => setConfirmPassword(event.target.value)}
+                                placeholder="Repeat new password"
+                                autoComplete="new-password"
+                            />
+                        </div>
+
+                        {passwordError && <p className="profile-form-message profile-form-message--error">{passwordError}</p>}
+                        {passwordSuccess && <p className="profile-form-message profile-form-message--success">{passwordSuccess}</p>}
+
+                        <div className="profile-form-actions">
+                            <button className="profile-change-password-btn" type="submit" disabled={changingPassword}>
+                                {changingPassword ? 'Saving...' : 'Save Password'}
+                            </button>
+                            <button className="profile-secondary-btn" type="button" onClick={closePasswordForm} disabled={changingPassword}>
+                                Cancel
+                            </button>
+                        </div>
+                    </form>
+                )}
             </div>
         </div>
     );
