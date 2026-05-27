@@ -31,4 +31,5 @@ public interface FileService {
         List<FileEntity> listAccessibleFiles(UUID userId);
 
         InputStream downloadFile(UUID fileId);
+
 }

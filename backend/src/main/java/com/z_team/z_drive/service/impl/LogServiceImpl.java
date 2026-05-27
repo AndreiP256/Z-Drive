@@ -15,12 +15,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class LogServiceImpl implements LogService {
+
+    private static final String PROFILE_PICTURE_PREFIX = "profile-pictures/";
 
     private final LogRepository logRepository;
     private final UserRepository userRepository;
@@ -42,6 +43,10 @@ public class LogServiceImpl implements LogService {
     @Override
     @Transactional
     public void logAction(UUID userId, String action, UUID fileId, String details) {
+        if (shouldSkipLogging(action, fileId)) {
+            return;
+        }
+
         Log log = new Log(userId, action, fileId, details);
         logRepository.save(log);
     }
@@ -52,6 +57,10 @@ public class LogServiceImpl implements LogService {
     @Override
     @Transactional
     public void logAction(UUID userId, String action, UUID fileId, String details, String status) {
+        if (shouldSkipLogging(action, fileId)) {
+            return;
+        }
+
         Log log = new Log(userId, action, fileId, details);
         log.setStatus(status);
         logRepository.save(log);
@@ -198,6 +207,17 @@ public class LogServiceImpl implements LogService {
         return fileRepository.findById(fileId)
                 .map(f -> f.getName())
                 .orElse("Unknown File");
+    }
+
+    private boolean shouldSkipLogging(String action, UUID fileId) {
+        if (!"DOWNLOAD".equalsIgnoreCase(action) || fileId == null) {
+            return false;
+        }
+
+        return fileRepository.findById(fileId)
+                .map(file -> file.getFileLocation() != null
+                        && file.getFileLocation().startsWith(PROFILE_PICTURE_PREFIX))
+                .orElse(false);
     }
 
     /**

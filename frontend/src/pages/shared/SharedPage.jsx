@@ -117,11 +117,6 @@ const SharedPage = () => {
                 </div>
             )}
 
-            <div className="page-info-banner">
-                This view uses /files/accessible. The backend does not expose a separate direct-share list yet.
-                {!canFilterOwnFiles && ' Owner metadata is unavailable, so the full accessible list is shown.'}
-            </div>
-
             <FileToolbar
                 searchQuery={searchQuery}
                 onSearchChange={setSearchQuery}
