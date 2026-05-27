@@ -385,21 +385,37 @@ public class FileServiceImpl implements FileService {
                     .contentType(file.getContentType())
                     .build(), 
                     RequestBody.fromInputStream(file.getInputStream(), file.getSize()));
+
+            FileEntity profilePicture = new FileEntity();
+            profilePicture.setId(fileId);
+            profilePicture.setName(file.getOriginalFilename());
+            profilePicture.setType(file.getContentType());
+            profilePicture.setSize((float) file.getSize());
+            profilePicture.setFileLocation(storageKey);
+            profilePicture.setOwnerId(userId);
+            profilePicture.setParentId(null);
+            profilePicture.setIsFolder(false);
+
+            FileEntity saved = fileRepository.save(profilePicture);
+
+            logService.logAction(
+                    userId,
+                    "UPLOAD_PROFILE_PICTURE",
+                    fileId,
+                    String.format("Uploaded profile picture: %s (%.2f KB)", file.getOriginalFilename(), file.getSize() / 1024.0)
+            );
+
+            return saved;
         } catch (IOException e) {
+            logService.logAction(
+                    userId,
+                    "UPLOAD_PROFILE_PICTURE",
+                    fileId,
+                    String.format("Failed to upload profile picture: %s - Error: %s", file.getOriginalFilename(), e.getMessage()),
+                    "FAILED"
+            );
             throw new RuntimeException("Failed to upload profile picture", e);
         }
-
-        FileEntity profilePicture = new FileEntity();
-        profilePicture.setId(fileId);
-        profilePicture.setName(file.getOriginalFilename());
-        profilePicture.setType(file.getContentType());
-        profilePicture.setSize((float) file.getSize());
-        profilePicture.setFileLocation(storageKey);
-        profilePicture.setOwnerId(userId);
-        profilePicture.setParentId(null);
-        profilePicture.setIsFolder(false);
-
-        return fileRepository.save(profilePicture);
     }
 
     private boolean isProfilePicture(FileEntity file) {
