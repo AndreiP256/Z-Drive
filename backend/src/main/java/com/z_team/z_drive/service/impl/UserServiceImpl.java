@@ -209,5 +209,11 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new NoSuchElementException("User not found with ID: " + currentUserId));
         user.setPassword(passwordManager.hashPassword(newPassword));
         userRepository.save(user);
+
+    logService.logAction(
+        currentUserId,
+        "CHANGE_PASSWORD",
+        "Changed account password"
+    );
     }
 }
